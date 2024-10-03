@@ -1,19 +1,23 @@
+
+
 import cv2
 import matplotlib.pyplot as plt
+
+# Local application/library specific imports
+
+import utils
 
 # ---------------------------------------------------------------------------------
 # Author: Agustina Ghelfi, Grigor Grigoryan, Philip Zetterberg, Vincent Heuer
 # Date: 03.10.2024
 # Version: 1.0
 # 
-# Version 1.1 ads more detailed German descriptions to the notebook
+# Version 1.0 tackles the tasks of the first week
 #
 # Description:
-# This Python script is designed to analyze part lists of wooden crates (HPE 5 tons) in order to calculate manufacturing times.
+# This Python script proposes a solution to building a query for museum paintings using CV techniques such as 1D histogram comparison and more.
 #
-#
-# In the future this should be checked with more data from different production locations of Axxum. Furthermore, representation of 
-# bottom boards need to be included aswell as a dynamic representation of OSB boards in the sawing process.
+# In the future this mainscript is expanded to enhance the system's capability and to tackle the upcoming challenges.
 # ---------------------------------------------------------------------------------
 
 
