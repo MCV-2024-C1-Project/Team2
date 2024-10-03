@@ -9,6 +9,29 @@ import numpy as np
 #
 # ---------------------------------------------------------------------------------
 
+def hist_plot_grey(img):
+    # Convert Image and calculate a histogram
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+       
+    hist = cv2.calcHist([img_gray], [0], None, [256], [0, 256])
+    hist /= hist.sum()
+
+    # Plot histogram and return it
+    plt.plot(hist, colour='black')
+    plt.title('Histogram of Greyscale Value')
+    plt.xlabel('Pixel Intensity')
+    plt.ylabel('Frequency')
+    plt.xlim([0, 255]
+    plt.show()
+           
+    #return plt
+
+
+
+def hist_plot_RGB(img):
+    
+    
+
 def euc_dist(h1, h2):
     
     if len(h1) != 256 or len(h2) != 256:
