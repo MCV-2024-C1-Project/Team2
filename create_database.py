@@ -90,7 +90,6 @@ for filename in os.listdir(directory):
 
         concatenated_hist_hsv = np.concatenate(histograms_concatenated_hsv)
 
-
         histograms = {
             'grey': hist_grey,
             'hist_RGB': concatenated_hist_rgb,
