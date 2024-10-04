@@ -5,15 +5,15 @@ import numpy as np
 # Date: 03.10.2024
 #
 # Description:
-# This Python script contains useful functions for use in CV problems. The functions are used to solve the tasks of the MCV24 C1 class and will be expanded as needed during the class.
+# This library contains useful functions for use in CV problems. The functions are used to solve the tasks of the MCV24 C1 class and will be expanded as needed during the class.
 #
 # ---------------------------------------------------------------------------------
 
 def hist_plot_grey(img):
     # Input: img (numpy array) - BGR image
     # Convert image to greyscale and calculate the histogram (normalized)
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    hist = cv2.calcHist([img_gray], [0], None, [256], [0, 256])
+    img_grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    hist = cv2.calcHist([img_grey], [0], None, [256], [0, 256])
     hist /= hist.sum()
 
     # Plot the greyscale histogram
