@@ -90,7 +90,6 @@ for filename in os.listdir(directory):
 
         concatenated_hist_hsv = np.concatenate(histograms_concatenated_hsv)
 
-
         histograms = {
             'grey': hist_grey,
             'hist_RGB': concatenated_hist_rgb,
@@ -188,7 +187,11 @@ for filename in os.listdir(directory_query):
         }
 
         pkl_filename = os.path.splitext(filename)[0] + '.pkl'
+<<<<<<< HEAD
         pkl_path = os.path.join(directory_query, pkl_filename) # changed directories 
+=======
+        pkl_path = os.path.join(directory_query, pkl_filename)
+>>>>>>> 9c7dd5deae5ffbefe9e164a8dd66e4bae9f7ff59
 
         with open(pkl_path, 'wb') as pkl_file:
             pickle.dump(histograms, pkl_file)
