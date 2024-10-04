@@ -27,27 +27,36 @@ directory = 'data/BBDD'
 
 for filename in os.listdir(directory):
     if filename.endswith('.jpg'):
+        # Define the corresponding pickle file path
+        pkl_filename = os.path.splitext(filename)[0] + '.pkl'
+        pkl_path = os.path.join(directory, pkl_filename)
+
+        # Check if the pickle file already exists
+        if os.path.exists(pkl_path):
+            continue  # Skip to the next image
+
+        # Proceed with image processing if no pickle file is found
         img_path = os.path.join(directory, filename)
 
+        # Grayscale Histogram
         img_grey = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         hist_grey = cv2.calcHist([img_grey], [0], None, [256], [0, 256])
-        hist_grey /= hist_grey.sum() # changed "hist.sum() to hist_grey.sum()"
+        hist_grey /= hist_grey.sum()  # Normalize the histogram
 
-
-        # RGB
-        img_RGB=cv2.imread(img_path)
+        # RGB Histograms
+        img_RGB = cv2.imread(img_path)
         B, G, R = cv2.split(img_RGB)
 
         hist_B = cv2.calcHist([B], [0], None, [256], [0, 256])
-        hist_B /= hist_R.sum()
+        hist_B /= hist_B.sum()  # Normalize the histogram
 
         hist_G = cv2.calcHist([G], [0], None, [256], [0, 256])
-        hist_G /= hist_G.sum()
+        hist_G /= hist_G.sum()  # Normalize the histogram
 
         hist_R = cv2.calcHist([R], [0], None, [256], [0, 256])
-        hist_R /= hist_B.sum()
+        hist_R /= hist_R.sum()  # Normalize the histogram
 
-
+        # Store histograms in a dictionary
         histograms = {
             'grey': hist_grey,
             'hist_B': hist_B,
@@ -55,8 +64,12 @@ for filename in os.listdir(directory):
             'hist_R': hist_R,
         }
 
-        pkl_filename = os.path.splitext(filename)[0] + '.pkl'
-        pkl_path = os.path.join(directory, pkl_filename)
-
+        # Save the histograms to a pickle file
         with open(pkl_path, 'wb') as pkl_file:
             pickle.dump(histograms, pkl_file)
+
+        print(f"Processed and saved histograms for {filename}")
+
+print("Task 1 complete.") 
+
+#----------<task 2 & 3>---------
