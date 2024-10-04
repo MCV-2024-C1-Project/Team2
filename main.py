@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 
 import utils
 
+# Directories
+
+directory = 'data/BBDD'
+
 # ---------------------------------------------------------------------------------
 # Author: Agustina Ghelfi, Grigor Grigoryan, Philip Zetterberg, Vincent Heuer
 # Date: 03.10.2024
@@ -22,41 +26,39 @@ import utils
 
 #----------<main>-----------
 #----------<task 1>---------
+# In this first section a database is created. The code takes each image of the folder data/BBDD and creates three histograms: grescale, red chanel, green chanel and blue chanel.
+# For each image a .pkl file is created and the histogram information is saved as list of lists in the same directory. If the files already exists the code skips the creation.
 
-directory = 'data/BBDD'
 
 for filename in os.listdir(directory):
     if filename.endswith('.jpg'):
-        # Define the corresponding pickle file path
+        
+        # Check for existing data
         pkl_filename = os.path.splitext(filename)[0] + '.pkl'
         pkl_path = os.path.join(directory, pkl_filename)
-
-        # Check if the pickle file already exists
         if os.path.exists(pkl_path):
-            continue  # Skip to the next image
-
-        # Proceed with image processing if no pickle file is found
+            continue  
+            
         img_path = os.path.join(directory, filename)
 
         # Grayscale Histogram
         img_grey = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         hist_grey = cv2.calcHist([img_grey], [0], None, [256], [0, 256])
-        hist_grey /= hist_grey.sum()  # Normalize the histogram
+        hist_grey /= hist_grey.sum() 
 
         # RGB Histograms
         img_RGB = cv2.imread(img_path)
         B, G, R = cv2.split(img_RGB)
 
         hist_B = cv2.calcHist([B], [0], None, [256], [0, 256])
-        hist_B /= hist_B.sum()  # Normalize the histogram
+        hist_B /= hist_B.sum()  
 
         hist_G = cv2.calcHist([G], [0], None, [256], [0, 256])
-        hist_G /= hist_G.sum()  # Normalize the histogram
+        hist_G /= hist_G.sum()  
 
         hist_R = cv2.calcHist([R], [0], None, [256], [0, 256])
-        hist_R /= hist_R.sum()  # Normalize the histogram
+        hist_R /= hist_R.sum()  
 
-        # Store histograms in a dictionary
         histograms = {
             'grey': hist_grey,
             'hist_B': hist_B,
