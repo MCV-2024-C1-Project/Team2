@@ -62,9 +62,7 @@ def hist_plot_RGB(img):
 
 def euc_dist(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
-    # Calculate the Euclidean distance between two histograms
-    if len(h1) != 256 or len(h2) != 256:
-        raise ValueError("Both histograms must have a length of 256")    
+    # Calculate the Euclidean distance between two histograms  
     
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -76,8 +74,6 @@ def euc_dist(h1, h2):
 def L1_dist(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
     # Calculate the L1 (Manhattan) distance between two histograms
-    if len(h1) != 256 or len(h2) != 256:
-        raise ValueError("Both histograms must have a length of 256")
     
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -89,8 +85,6 @@ def L1_dist(h1, h2):
 def X2_distance(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
     # Calculate the Chi-Square distance between two histograms
-    if len(h1) != 256 or len(h2) != 256:
-        raise ValueError("Both histograms must have a length of 256")
 
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -102,8 +96,6 @@ def X2_distance(h1, h2):
 def histogram_similiarity(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
     # Calculate the similarity between two histograms using the intersection method
-    if len(h1) != 256 or len(h2) != 256:
-        raise ValueError("Both histograms must have a length of 256")
 
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -115,8 +107,6 @@ def histogram_similiarity(h1, h2):
 def hellinger_kernel(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
     # Calculate the Hellinger kernel similarity between two histograms
-    if len(h1) != 256 or len(h2) != 256:
-        raise ValueError("Both histograms must have a length of 256")
         
     h1 = np.array(h1)
     h2 = np.array(h2)
