@@ -1,15 +1,4 @@
-
-
-import cv2
-import matplotlib.pyplot as plt
 import subprocess
-# Local application/library specific imports
-
-import utils
-
-# Directories
-
-directory = 'data/BBDD'
 
 # ---------------------------------------------------------------------------------
 # Author: Agustina Ghelfi, Grigor Grigoryan, Philip Zetterberg, Vincent Heuer
@@ -22,8 +11,8 @@ directory = 'data/BBDD'
 # This main script runs the scripts that were used to complete the task one after the other and sends a message when if the script ran successflu or not.
 # ---------------------------------------------------------------------------------
 
-
 def run_script(script_name):
+    # This function tries to run scripts as subprocess
     try:
         result = subprocess.run(['python', script_name], check=True)
         print(f"Successfully ran {script_name}")
@@ -31,9 +20,7 @@ def run_script(script_name):
         print(f"Error running {script_name}: {e}")
 
 if __name__ == "__main__":
-    # List of scripts to run in sequence
-    scripts = ['task_1.py', 'task_2&3.py', 'task_4.py']
+    scripts = ['create_database.py', 'task_3.py', 'task_4.py'] # Names of the scripts that should be run as string
     
-    # Run each script
     for script in scripts:
         run_script(script)
