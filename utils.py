@@ -1,4 +1,7 @@
 import numpy as np
+import pickle
+import cv2
+import matplotlib.pyplot as plt
 
 # ---------------------------------------------------------------------------------
 # Author: Agustina Ghelfi, Grigor Grigoryan, Philip Zetterberg, Vincent Heuer
@@ -62,7 +65,9 @@ def hist_plot_RGB(img):
 
 def euc_dist(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
-    # Calculate the Euclidean distance between two histograms  
+    # Calculate the Euclidean distance between two histograms
+    if len(h1) != 256 or len(h2) != 256:
+        raise ValueError("Both histograms must have a length of 256")    
     
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -74,6 +79,8 @@ def euc_dist(h1, h2):
 def L1_dist(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
     # Calculate the L1 (Manhattan) distance between two histograms
+    if len(h1) != 256 or len(h2) != 256:
+        raise ValueError("Both histograms must have a length of 256")
     
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -85,6 +92,8 @@ def L1_dist(h1, h2):
 def X2_distance(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
     # Calculate the Chi-Square distance between two histograms
+    if len(h1) != 256 or len(h2) != 256:
+        raise ValueError("Both histograms must have a length of 256")
 
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -96,6 +105,8 @@ def X2_distance(h1, h2):
 def histogram_similiarity(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
     # Calculate the similarity between two histograms using the intersection method
+    if len(h1) != 256 or len(h2) != 256:
+        raise ValueError("Both histograms must have a length of 256")
 
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -107,6 +118,8 @@ def histogram_similiarity(h1, h2):
 def hellinger_kernel(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms with 256 bins
     # Calculate the Hellinger kernel similarity between two histograms
+    if len(h1) != 256 or len(h2) != 256:
+        raise ValueError("Both histograms must have a length of 256")
         
     h1 = np.array(h1)
     h2 = np.array(h2)
@@ -123,3 +136,68 @@ def load_and_print_pkl(pkl_file_path):
         print("Content of the pickle file:")
         print(data)
 
+def apk(actual, predicted, k=10):
+    """
+    Computes the average precision at k.
+    Source: https://github.com/benhamner/Metrics/blob/master/Python/ml_metrics/average_precision.py
+    This function computes the average prescision at k between two lists of
+    items.
+
+    Parameters
+    ----------
+    actual : list
+             A list of elements that are to be predicted (order doesn't matter)
+    predicted : list
+                A list of predicted elements (order does matter)
+    k : int, optional
+        The maximum number of predicted elements
+
+    Returns
+    -------
+    score : double
+            The average precision at k over the input lists
+
+    """
+    if len(predicted)>k:
+        predicted = predicted[:k]
+
+    score = 0.0
+    num_hits = 0.0
+
+    for i,p in enumerate(predicted):
+        if p in actual and p not in predicted[:i]:
+            num_hits += 1.0
+            score += num_hits / (i+1.0)
+
+    if not actual:
+        return 0.0
+
+    return score / min(len(actual), k)
+
+
+def mapk(actual, predicted, k=10):
+    """
+    source: https://github.com/benhamner/Metrics/blob/master/Python/ml_metrics/average_precision.py
+    Computes the mean average precision at k.
+
+    This function computes the mean average prescision at k between two lists
+    of lists of items.
+
+    Parameters
+    ----------
+    actual : list
+             A list of lists of elements that are to be predicted 
+             (order doesn't matter in the lists)
+    predicted : list
+                A list of lists of predicted elements
+                (order matters in the lists)
+    k : int, optional
+        The maximum number of predicted elements
+
+    Returns
+    -------
+    score : double
+            The mean average precision at k over the input lists
+
+    """
+    return np.mean([apk(a,p,k) for a,p in zip(actual, predicted)])
