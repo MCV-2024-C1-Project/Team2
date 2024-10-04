@@ -188,7 +188,7 @@ for filename in os.listdir(directory_query):
         }
 
         pkl_filename = os.path.splitext(filename)[0] + '.pkl'
-        pkl_path = os.path.join(directory, pkl_filename)
+        pkl_path = os.path.join(directory_query, pkl_filename) # changed directories 
 
         with open(pkl_path, 'wb') as pkl_file:
             pickle.dump(histograms, pkl_file)
