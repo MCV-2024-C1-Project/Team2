@@ -91,7 +91,9 @@ def X2_distance(h1, h2):
 
     h1 = np.array(h1)
     h2 = np.array(h2)
-    distance = np.sum((np.sqrt(h1 - h2) ** 2) / (h1 + h2))
+    denominator = h1 + h2
+    denominator = np.where(denominator == 0, 1, denominator)  # to not divide into zero
+    distance = np.sum((np.sqrt(np.abs(h1 - h2)) ** 2) / denominator)
 
     return distance
 
