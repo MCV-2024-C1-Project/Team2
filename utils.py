@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 #
 # ---------------------------------------------------------------------------------
 
+
 def hist_plot_grey(img):
     # Input: img (numpy array) - BGR image
     # Convert image to greyscale and calculate the histogram (normalized)
@@ -38,7 +39,7 @@ def hist_plot_RGB(img):
 
     # Plot histograms for Red, Green, and Blue channels
     plt.figure(figsize=(15, 5))
-    
+
     plt.subplot(1, 3, 1)
     plt.plot(hist_R, color='red')
     plt.title('Histogram of Red Channel')
@@ -61,12 +62,12 @@ def hist_plot_RGB(img):
     plt.xlim([0, 256])
 
     plt.show()
-    
+
 
 def euc_dist(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms 
     # Calculate the Euclidean distance between two histograms  
-    
+
     h1 = np.array(h1)
     h2 = np.array(h2)
     distance = np.sqrt(np.sum((h1 - h2) ** 2))
@@ -81,7 +82,7 @@ def L1_dist(h1, h2):
     h1 = np.array(h1)
     h2 = np.array(h2)
     distance = np.sum(np.abs(h1 - h2))
-    
+
     return distance
 
 
@@ -112,7 +113,7 @@ def histogram_similiarity(h1, h2):
 def hellinger_kernel(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histogram
     # Calculate the Hellinger kernel similarity between two histograms
-        
+
     h1 = np.array(h1)
     h2 = np.array(h2)
     similiarity = np.sum(np.sqrt(h1 * h2))
@@ -127,6 +128,7 @@ def load_and_print_pkl(pkl_file_path):
         data = pickle.load(pkl_file)      
         print("Content of the pickle file:")
         print(data)
+
 
 def apk(actual, predicted, k=10):
     """
@@ -150,13 +152,13 @@ def apk(actual, predicted, k=10):
             The average precision at k over the input lists
 
     """
-    if len(predicted)>k:
+    if len(predicted) > k:
         predicted = predicted[:k]
 
     score = 0.0
     num_hits = 0.0
 
-    for i,p in enumerate(predicted):
+    for i, p in enumerate(predicted):
         if p in actual and p not in predicted[:i]:
             num_hits += 1.0
             score += num_hits / (i+1.0)
@@ -192,4 +194,4 @@ def mapk(actual, predicted, k=10):
             The mean average precision at k over the input lists
 
     """
-    return np.mean([apk(a,p,k) for a,p in zip(actual, predicted)])
+    return np.mean([apk(a, p, k) for a, p in zip(actual, predicted)])
