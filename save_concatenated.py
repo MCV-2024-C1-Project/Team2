@@ -28,14 +28,14 @@ def plot_individual_histogram(hist, image_name, save_dir):
     plt.plot(hist, color='blue')
     plt.xlabel('Concatenated HSV Bins')
     plt.ylabel('Probability')
-    plt.title(f'Concatenated HSV Histogram - {image_name}')
     plt.tight_layout()
 
-    hist_image_filename = os.path.join(save_dir, f'{image_name}_hsv_histogram.png')
+    # Save using the image's base name (without extension)
+    hist_image_filename = os.path.join(save_dir, f'{image_name}_concatenated_hsv_histogram.png')
     plt.savefig(hist_image_filename)
     plt.close()
 
-    print(f'Concatenated HSV histogram for {image_name} saved as {hist_image_filename}')
+    print(f'Concatenated HSV histogram saved as {hist_image_filename}')
 
 def plot_combined_histograms(hist1, hist2, image_name1, image_name2, save_dir):
     # Plot both concatenated histograms on the same plot
@@ -46,12 +46,11 @@ def plot_combined_histograms(hist1, hist2, image_name1, image_name2, save_dir):
     
     plt.xlabel('Concatenated HSV Bins')
     plt.ylabel('Probability')
-    plt.title(f'Combined HSV Histograms - {image_name1} and {image_name2}')
     plt.legend()
 
-    # Save the plot
+    # Save the plot using both image names
     os.makedirs(save_dir, exist_ok=True)
-    hist_image_filename = os.path.join(save_dir, 'combined_hsv_histograms.png')
+    hist_image_filename = os.path.join(save_dir, f'{image_name1}_{image_name2}_combined_hsv_histograms.png')
     plt.tight_layout()
     plt.savefig(hist_image_filename)
     plt.close()
