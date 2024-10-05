@@ -24,7 +24,7 @@ def run_script(script_name):
 
 if __name__ == "__main__":
     # Names of the scripts that should be run as string
-    scripts = ['create_database.py', 'task_3.py']
+    scripts = ['create_database.py', 'task_2.py', 'task_3&4.py']
 
     for script in scripts:
         run_script(script)
