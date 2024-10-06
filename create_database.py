@@ -15,7 +15,6 @@ import numpy as np
 # ---------------------------------------------------------------------------------
 
 directory = 'data/BBDD/' # Specify the directory of the database and the images
-
 # Loop through the data and perform operations
 for filename in os.listdir(directory): 
     if filename.endswith('.jpg'):
@@ -30,20 +29,11 @@ for filename in os.listdir(directory):
         histograms_concatenated_rgb = []
         img_BGR = cv2.imread(img_path)
         img_RGB = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)
-        hist_r = cv2.calcHist([img_RGB], [0], None, [256], [0, 256])
-        hist_r /= hist_r.sum()
-        hist_r=hist_r.flatten() #It is used to treat an image as a one-dimensional vector, mainly when the matrices are not the same shape. Maybe in this case we are looking at, it is not necessary because the matrices have the same shape.
-        histograms_concatenated_rgb.append(hist_r)
-
-        hist_g = cv2.calcHist([img_RGB], [1], None, [256], [0, 256])
-        hist_g /= hist_g.sum()
-        hist_g=hist_g.flatten()
-        histograms_concatenated_rgb.append(hist_g)
-
-        hist_b = cv2.calcHist([img_RGB], [2], None, [256], [0, 256])
-        hist_b /= hist_b.sum()
-        hist_b=hist_b.flatten()
-        histograms_concatenated_rgb.append(hist_b)
+        for channel in range(3):
+            hist = cv2.calcHist([img_RGB], [channel], None, [256], [0, 256])
+            hist /= hist.sum()  
+            hist = hist.flatten() 
+            histograms_concatenated_rgb.append(hist)
 
         concatenated_hist_rgb = np.concatenate(histograms_concatenated_rgb)
 
@@ -51,42 +41,22 @@ for filename in os.listdir(directory):
         histograms_concatenated_lab = []
         img_BGR = cv2.imread(img_path)
         img_LAB = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2LAB)
-        hist_l = cv2.calcHist([img_LAB], [0], None, [256], [0, 256])
-        hist_l /= hist_l.sum()
-        hist_l=hist_l.flatten() 
-        histograms_concatenated_lab.append(hist_l)
-
-        hist_a = cv2.calcHist([img_LAB], [1], None, [256], [0, 256])
-        hist_a /= hist_a.sum()
-        hist_a=hist_a.flatten()
-        histograms_concatenated_lab.append(hist_a)
-
-        hist_b = cv2.calcHist([img_LAB], [2], None, [256], [0, 256])
-        hist_b /= hist_b.sum()
-        hist_b=hist_b.flatten()
-        histograms_concatenated_lab.append(hist_b)
+        for channel in range(3):
+            hist = cv2.calcHist([img_LAB], [channel], None, [256], [0, 256])
+            hist /= hist.sum()  
+            hist = hist.flatten()  
+            histograms_concatenated_lab.append(hist)
 
         concatenated_hist_lab = np.concatenate(histograms_concatenated_lab)
 
         #HSV
         img_HSV = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
         histograms_concatenated_hsv = []
-        
-        hist_h = cv2.calcHist([img_HSV], [0], None, [256], [0, 256])
-        hist_h /= hist_h.sum()
-        hist_h = hist_h.flatten()  
-
-        histograms_concatenated_hsv.append(hist_h)
-
-        hist_s = cv2.calcHist([img_HSV], [1], None, [256], [0, 256])
-        hist_s /= hist_s.sum()
-        hist_s = hist_s.flatten()  
-        histograms_concatenated_hsv.append(hist_s)
-
-        hist_v = cv2.calcHist([img_HSV], [2], None, [256], [0, 256])
-        hist_v /= hist_v.sum()
-        hist_v = hist_v.flatten() 
-        histograms_concatenated_hsv.append(hist_v)
+        for channel in range(3):
+            hist = cv2.calcHist([img_HSV], [channel], None, [256], [0, 256])
+            hist /= hist.sum()  
+            hist = hist.flatten()  
+            histograms_concatenated_hsv.append(hist)
 
         concatenated_hist_hsv = np.concatenate(histograms_concatenated_hsv)
 
@@ -110,72 +80,43 @@ for filename in os.listdir(directory_query):
     if filename.endswith('.jpg'):
         img_path = os.path.join(directory_query, filename)
 
+        # Extract descriptors from image greyscale
         img_grey = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         hist_grey = cv2.calcHist([img_grey], [0], None, [256], [0, 256])
         hist_grey /= hist_grey.sum() # changed "hist.sum() to hist_grey.sum()"
 
-
-        # RGB
+        # Extract descriptors from RGB channels
         histograms_concatenated_rgb = []
         img_BGR = cv2.imread(img_path)
         img_RGB = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)
-        hist_r = cv2.calcHist([img_RGB], [0], None, [256], [0, 256])
-        hist_r /= hist_r.sum()
-        hist_r=hist_r.flatten() #It is used to treat an image as a one-dimensional vector, mainly when the matrices are not the same shape. Maybe in this case we are looking at, it is not necessary because the matrices have the same shape.
-        histograms_concatenated_rgb.append(hist_r)
-
-        hist_g = cv2.calcHist([img_RGB], [1], None, [256], [0, 256])
-        hist_g /= hist_g.sum()
-        hist_g=hist_g.flatten()
-        histograms_concatenated_rgb.append(hist_g)
-
-        hist_b = cv2.calcHist([img_RGB], [2], None, [256], [0, 256])
-        hist_b /= hist_b.sum()
-        hist_b=hist_b.flatten()
-        histograms_concatenated_rgb.append(hist_b)
+        for channel in range(3):
+            hist = cv2.calcHist([img_RGB], [channel], None, [256], [0, 256])
+            hist /= hist.sum()  
+            hist = hist.flatten() 
+            histograms_concatenated_rgb.append(hist)
 
         concatenated_hist_rgb = np.concatenate(histograms_concatenated_rgb)
 
-         #CieLab
+        #CieLab
         histograms_concatenated_lab = []
         img_BGR = cv2.imread(img_path)
         img_LAB = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2LAB)
-        hist_l = cv2.calcHist([img_LAB], [0], None, [256], [0, 256])
-        hist_l /= hist_l.sum()
-        hist_l=hist_l.flatten() 
-        histograms_concatenated_lab.append(hist_l)
-
-        hist_a = cv2.calcHist([img_LAB], [1], None, [256], [0, 256])
-        hist_a /= hist_a.sum()
-        hist_a=hist_a.flatten()
-        histograms_concatenated_lab.append(hist_a)
-
-        hist_b = cv2.calcHist([img_LAB], [2], None, [256], [0, 256])
-        hist_b /= hist_b.sum()
-        hist_b=hist_b.flatten()
-        histograms_concatenated_lab.append(hist_b)
+        for channel in range(3):
+            hist = cv2.calcHist([img_LAB], [channel], None, [256], [0, 256])
+            hist /= hist.sum()  
+            hist = hist.flatten()  
+            histograms_concatenated_lab.append(hist)
 
         concatenated_hist_lab = np.concatenate(histograms_concatenated_lab)
 
         #HSV
         img_HSV = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
         histograms_concatenated_hsv = []
-        
-        hist_h = cv2.calcHist([img_HSV], [0], None, [256], [0, 256])
-        hist_h /= hist_h.sum()
-        hist_h = hist_h.flatten()  
-
-        histograms_concatenated_hsv.append(hist_h)
-
-        hist_s = cv2.calcHist([img_HSV], [1], None, [256], [0, 256])
-        hist_s /= hist_s.sum()
-        hist_s = hist_s.flatten()  
-        histograms_concatenated_hsv.append(hist_s)
-
-        hist_v = cv2.calcHist([img_HSV], [2], None, [256], [0, 256])
-        hist_v /= hist_v.sum()
-        hist_v = hist_v.flatten() 
-        histograms_concatenated_hsv.append(hist_v)
+        for channel in range(3):
+            hist = cv2.calcHist([img_HSV], [channel], None, [256], [0, 256])
+            hist /= hist.sum()  
+            hist = hist.flatten()  
+            histograms_concatenated_hsv.append(hist)
 
         concatenated_hist_hsv = np.concatenate(histograms_concatenated_hsv)
 
