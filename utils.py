@@ -90,11 +90,19 @@ def X2_distance(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms
     # Calculate the Chi-Square distance between two histograms
 
+    similarity = cv2.compareHist(h1, h2, cv2.HISTCMP_CHISQR_ALT)
+
+    return similarity
+
+def our_metric(h1, h2):
+    # Input: h1, h2 (list or numpy array) - Histograms
+    # Calculate the Chi-Square distance between two histograms
+
     h1 = np.array(h1)
     h2 = np.array(h2)
     denominator = h1 + h2
     denominator = np.where(denominator == 0, 1, denominator)  # to not divide into zero
-    distance = np.sum((np.sqrt(np.abs(h1 - h2)) ** 2) / denominator)
+    distance = np.sum((np.abs(h1 - h2)) / denominator)
 
     return distance
 
@@ -103,22 +111,18 @@ def histogram_similiarity(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histogram
     # Calculate the similarity between two histograms using the intersection method
 
-    h1 = np.array(h1)
-    h2 = np.array(h2)
-    similiarity = np.sum(np.minimum(h1, h2))
+    similarity = cv2.compareHist(h1, h2, cv2.HISTCMP_INTERSECT)
 
-    return similiarity
+    return similarity
 
 
 def hellinger_kernel(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histogram
     # Calculate the Hellinger kernel similarity between two histograms
 
-    h1 = np.array(h1)
-    h2 = np.array(h2)
-    similiarity = np.sum(np.sqrt(h1 * h2))
+    similarity = cv2.compareHist(h1, h2, cv2.HISTCMP_BHATTACHARYYA)
 
-    return similiarity
+    return similarity
 
 
 def load_and_print_pkl(pkl_file_path):
