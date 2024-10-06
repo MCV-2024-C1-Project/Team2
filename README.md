@@ -41,14 +41,20 @@ This project focuses on **Content-Based Image Retrieval (CBIR)**, where the main
 - Additional libraries: [benhamner/Metrics](https://github.com/benhamner/Metrics) for computing mAP@K
 
 ### Instructions
-1. **Compute Descriptors**:
-   - Run the create_database.py script to generate descriptors for both **museum** and **query images**.
-   
-2. **Similarity Measures**:
-   - Use the implemented similarity functions to compute distances between query and museum descriptors (task2.py).
 
-3. **Retrieve Top K Images**:
-   - For each query image, retrieve and rank the **top K most similar museum images**. (task_3&4.py)
+1. **Run Main Script**:
+   - Start by running the `main.py` script to initialize and prepare the environment for the following steps.
+     
+2. **Compute Descriptors**:
+   - Run the `create_database.py` script to generate descriptors for both **museum** and **query images**.
+   
+3. **Similarity Measures**:
+   - Use the implemented similarity functions to compute distances between query and museum descriptors (`task2.py`).
+
+4. **Retrieve Top K Images**:
+   - For each query image, retrieve and rank the **top K most similar museum images**. (`task_3&4.py`)
+
+
 
 ### File Structure
 - project_root/
@@ -57,9 +63,9 @@ This project focuses on **Content-Based Image Retrieval (CBIR)**, where the main
   - qsd1_w1/              # Query dataset
 
   - src/
-    - create_database.py       # Code for loading images, extracting descriptors, and saving as a .pkl file.
-    - task2.py        # Code for similarity measures
-    - task_3&4.py         # Code for retrieving top K images
+    - `create_database.py`       # Code for loading images, extracting descriptors, and saving as a .pkl file.
+    - `task2.py`        # Code for similarity measures
+    - `task_3&4.py`         # Code for retrieving top K images
   - results/
     - week1/
         - method1/result.pkl     # Retrieval results for QSD1 method1
