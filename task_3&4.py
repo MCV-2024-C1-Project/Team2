@@ -4,7 +4,7 @@ import pickle
 import utils
 import numpy as np
 
-directory = 'test/W1/QST1'
+directory = 'datasets/qst1_w1/'
 directory_bbdd = 'data/BBDD/'
 
 
@@ -79,7 +79,7 @@ predicted_flattened_k_5 = [p for p in list_results_k_5]
 predicted_flattened_k_10 = [p for p in list_results_k_10]
 
 
-with open(f'test/W1/QST1/gt_corresps.pkl', 'rb') as f:
+with open(f'datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
     ground_truth = pickle.load(f)
 
 print("Method 1 - LAB with our metric; k=1 mapk:", utils.mapk(ground_truth, list_results_k_1, k=1))
@@ -89,7 +89,7 @@ print("Method 1 - LAB with our metric; k=5 mapk:", utils.mapk(ground_truth, pred
 list_results_k_10_enteros = [[int(x) for x in sublist] for sublist in list_results_k_10]
 
 # store results k=10
-with open('results/week1/method1/result.pkl', 'wb') as pkl_file:
+with open('results/week1/QST1/method1/result.pkl', 'wb') as pkl_file:
     pickle.dump(list_results_k_10_enteros, pkl_file)
 
 # Method 2
@@ -145,7 +145,7 @@ list_results_k_10 = [result for result in list_results_k_10]
 predicted_flattened_k_5 = [p for p in list_results_k_5]
 predicted_flattened_k_10 = [p for p in list_results_k_10]
 
-with open(f'test/W1/QST1/gt_corresps.pkl', 'rb') as f:
+with open(f'datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
     ground_truth = pickle.load(f)
 
 print("Method 2 - HSV with our metric; k=1 mapk:", utils.mapk(ground_truth, list_results_k_1, k=1))
@@ -155,7 +155,7 @@ print("Method 2 - HSV with our metric; k=5 mapk:", utils.mapk(ground_truth, pred
 list_results_k_10_enteros = [[int(x) for x in sublist] for sublist in list_results_k_10]
 
 # store results k=10
-with open('results/week1/method2/result.pkl', 'wb') as pkl_file:
+with open('results/week1/QST1/method2/result.pkl', 'wb') as pkl_file:
     pickle.dump(list_results_k_10_enteros, pkl_file)
 
 
@@ -217,7 +217,7 @@ predicted_flattened_k_5 = [p for p in list_results_k_5]
 predicted_flattened_k_10 = [p for p in list_results_k_10]
 
 
-with open(f'qsd1_w1/gt_corresps.pkl', 'rb') as f:
+with open(f'datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
     ground_truth = pickle.load(f)
 
 print("HSV with X2_distance; k=1 mapk:", utils.mapk(ground_truth, list_results_k_1, k=1))
@@ -277,7 +277,7 @@ list_results_k_10 = [result for result in list_results_k_10]
 predicted_flattened_k_5 = [p for p in list_results_k_5]
 predicted_flattened_k_10 = [p for p in list_results_k_10]
 
-with open(f'qsd1_w1/gt_corresps.pkl', 'rb') as f:
+with open(f'datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
     ground_truth = pickle.load(f)
 
 print("LAB with X2_distance; k=1 mapk:", utils.mapk(ground_truth, list_results_k_1, k=1))
