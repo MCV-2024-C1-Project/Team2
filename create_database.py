@@ -16,7 +16,7 @@ import numpy as np
 
 directory = 'data/BBDD/' # Specify the directory of the database and the images
 # Loop through the data and perform operations
-for filename in os.listdir(directory): 
+for filename in os.listdir(directory):
     if filename.endswith('.jpg'):
         img_path = os.path.join(directory, filename)
 
