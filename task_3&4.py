@@ -4,7 +4,7 @@ import pickle
 import utils
 import numpy as np
 
-directory = 'qsd1_w1'
+directory = 'test/W1/QST1'
 directory_bbdd = 'data/BBDD/'
 
 
@@ -79,7 +79,7 @@ predicted_flattened_k_5 = [p for p in list_results_k_5]
 predicted_flattened_k_10 = [p for p in list_results_k_10]
 
 
-with open(f'qsd1_w1/gt_corresps.pkl', 'rb') as f:
+with open(f'test/W1/QST1/gt_corresps.pkl', 'rb') as f:
     ground_truth = pickle.load(f)
 
 print("Method 1 - LAB with our metric; k=1 mapk:", utils.mapk(ground_truth, list_results_k_1, k=1))
@@ -145,7 +145,7 @@ list_results_k_10 = [result for result in list_results_k_10]
 predicted_flattened_k_5 = [p for p in list_results_k_5]
 predicted_flattened_k_10 = [p for p in list_results_k_10]
 
-with open(f'qsd1_w1/gt_corresps.pkl', 'rb') as f:
+with open(f'test/W1/QST1/gt_corresps.pkl', 'rb') as f:
     ground_truth = pickle.load(f)
 
 print("Method 2 - HSV with our metric; k=1 mapk:", utils.mapk(ground_truth, list_results_k_1, k=1))
