@@ -55,7 +55,7 @@ def spatial_pyramid_histogram(image, levels=2, hist_size=8, hist_range=[0,255]):
 
     pyramid_hist = []
     # resize image to 256*256
-    image = cv2.resize(image, (256, 256), interpolation = cv2.INTER_AREA)
+    image = cv2.resize(image, (256, 256), interpolation = cv2.INTER_AREA) # NEEDS DISCUSSION
     h, w = image.shape[:2]  # Get the height and width of the image
     channels = 1 if len(image.shape) == 2 else image.shape[2]  # Check number of channels
 
@@ -73,14 +73,14 @@ def spatial_pyramid_histogram(image, levels=2, hist_size=8, hist_range=[0,255]):
                 block_hist = []
                 if channels == 1:
                     # Single-channel image (grayscale)
-                    hist = cv2.calcHist([block], [0], None, [hist_size], hist_range)
+                    hist = cv2.calcHist([block], [0], None, [hist_size], hist_range) 
                     hist /= hist.sum()  # Normalize the histogram
                     block_hist.append(hist.flatten())
                 else:
                     # Multi-channel image (e.g., BGR)
                     for ch in range(channels):
                         #print(f'channel'+str(ch))
-                        hist = cv2.calcHist([block], [ch], None, [hist_size], hist_range)
+                        hist = cv2.calcHist([block], [ch], None, [hist_size], hist_range) # I would change this block with hsv_hist3D(image)
                         hist /= hist.sum()  # Normalize the histogram
                         block_hist.append(hist.flatten())
 
@@ -146,10 +146,12 @@ def process_directory(directory_path):
             with open(pkl_path, 'wb') as pkl_file:
                 pickle.dump(histograms, pkl_file)
 
-# process both folders
-directory_query1 = "../../datasets/qsd1_w1/"
-directory_query2 = "../../data/BBDD"
 
+
+# process both folders
+directory_query1 = "datasets/qsd1_w1"
+directory_query2 = "data/BBDD"
+print("Current working directory:", os.getcwd())
 print("Processing directory 1:")
 process_directory(directory_query1)
 
