@@ -139,9 +139,9 @@ def process_directory(directory_path):
                 'hist_HSV_256': hist_HSV_256,
             }
 
-            directory_path = os.path.join(directory_path, '/week2')
+            save_path = directory_path + '/week2'
             pkl_filename = os.path.splitext(filename)[0] + '_w2.pkl'
-            pkl_path = os.path.join(directory_path, pkl_filename)
+            pkl_path = os.path.join(save_path, pkl_filename)
             #print(pkl_path)
             with open(pkl_path, 'wb') as pkl_file:
                 pickle.dump(histograms, pkl_file)
