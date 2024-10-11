@@ -1,12 +1,6 @@
 import cv2
 import numpy as np
-
-# Load images
-image_jpg_path = 'datasets/qsd2_w1/00002.jpg'
-image_png_path = 'datasets/qsd2_w1/00002.png'
-
-image_jpg = cv2.imread(image_jpg_path)
-image_png = cv2.imread(image_png_path, cv2.IMREAD_GRAYSCALE)  # Assuming PNG is a binary mask
+import os
 
 
 # Function to create a foreground square (10% of the height and width)
@@ -31,7 +25,7 @@ def create_foreground_square(image, percentage=10):
 
 
 # Function to create a background model from the edges
-def create_background_model(image, bg_value=50):
+def create_background_model(image, bg_value=20):
     height, width, _ = image.shape
 
     # Get the pixels from the specified number of pixels from the edges
@@ -50,104 +44,77 @@ def create_background_model(image, bg_value=50):
     return avg_color_bg
 
 
-# Function to automatically set the edge pixels as background
-def set_edge_background(mask, top, bottom, left, right):
-    # Set top, bottom, left, and right edge pixels as background (0)
-    mask[:top, :] = 0          # Top edge
-    mask[-bottom:, :] = 0      # Bottom edge
-    mask[:, :left] = 0         # Left edge
-    mask[:, -right:] = 0       # Right edge
-
-
-# New function: Set the foreground square to white (255)
+# Function to set the foreground square to white (255)
 def set_edge_foreground(mask, start_x, end_x, start_y, end_y):
-    # Set the pixels within the square area to white (255)
-    mask[start_y:end_y, start_x:end_x] = 255  # Foreground square
-
+    mask[start_y:end_y, start_x:end_x] = 255  # Set the foreground square to white
     return mask
 
 
-# Function to apply morphological closing around the predefined foreground square
-def apply_morphological_closing_around_foreground_square(mask, start_x, end_x, start_y, end_y, kernel_size=(5, 5)):
-    # Create a copy of the mask to apply closing outside the square
-    mask_outside_square = mask.copy()
-
-    # Set the square area to 0 (to protect it from being modified)
-    # mask_outside_square[start_y:end_y, start_x:end_x] = 0
-
-    # Define the kernel for morphological operations
-    # kernel = np.ones(kernel_size, np.uint8)
-
-    # Apply morphological closing (dilation followed by erosion) outside the square
-    # closed_outside_square = cv2.morphologyEx(mask_outside_square, cv2.MORPH_CLOSE, kernel)
-
-    # Combine the original square with the processed outside area
-    final_mask = mask_outside_square
-    final_mask[start_y:end_y, start_x:end_x] = mask[start_y:end_y, start_x:end_x]  # Corrected line
-
-    return final_mask
-
-
-# Function to classify foreground and background in RGB, HSV, and LAB color spaces
-def classify_in_multiple_color_spaces(image, avg_color_bg_rgb, start_x, end_x, start_y, end_y, threshold=50):
+# Function to classify the image in HSV color space
+def classify_in_hsv(image, avg_color_bg_hsv, threshold=50):
     height, width, _ = image.shape
-    classified_mask_rgb = np.zeros((height, width), dtype=np.uint8)
     classified_mask_hsv = np.zeros((height, width), dtype=np.uint8)
-    classified_mask_lab = np.zeros((height, width), dtype=np.uint8)
 
-    # Convert image to HSV and LAB color spaces
+    # Convert image to HSV color space
     image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    image_lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
 
-    # Convert background average color to HSV and LAB
-    avg_color_bg_hsv = cv2.cvtColor(np.uint8([[avg_color_bg_rgb]]), cv2.COLOR_BGR2HSV)[0][0]
-    avg_color_bg_lab = cv2.cvtColor(np.uint8([[avg_color_bg_rgb]]), cv2.COLOR_BGR2LAB)[0][0]
-
-    # Classify each pixel based on distance to background in RGB, HSV, and LAB spaces
+    # Classify each pixel based on distance to background in HSV space
     for y in range(height):
         for x in range(width):
-            pixel_rgb = image[y, x]
             pixel_hsv = image_hsv[y, x]
-            pixel_lab = image_lab[y, x]
-
-            # Calculate distance to background in RGB, HSV, and LAB
-            dist_to_bg_rgb = np.linalg.norm(pixel_rgb - avg_color_bg_rgb)
             dist_to_bg_hsv = np.linalg.norm(pixel_hsv - avg_color_bg_hsv)
-            dist_to_bg_lab = np.linalg.norm(pixel_lab - avg_color_bg_lab)
-
-            # Classify the pixel based on proximity to background in each color space
-            classified_mask_rgb[y, x] = 255 if dist_to_bg_rgb > threshold else 0
             classified_mask_hsv[y, x] = 255 if dist_to_bg_hsv > threshold else 0
-            classified_mask_lab[y, x] = 255 if dist_to_bg_lab > threshold else 0
 
-    return classified_mask_rgb, classified_mask_hsv, classified_mask_lab
+    return classified_mask_hsv
 
 
-# Parameters for edge background (based on earlier calculations)
-top_bg = 20     # Example: 20 pixels from the top
-bottom_bg = 20  # Example: 20 pixels from the bottom
-left_bg = 20    # Example: 20 pixels from the left
-right_bg = 20   # Example: 20 pixels from the right
+# Function to evaluate the generated mask against the ground truth mask
+def evaluate_mask(generated_mask, ground_truth_mask):
+    # Compute Intersection over Union (IoU)
+    intersection = np.logical_and(generated_mask == 255, ground_truth_mask == 255).sum()
+    union = np.logical_or(generated_mask == 255, ground_truth_mask == 255).sum()
+    iou = intersection / union if union != 0 else 0
+    return iou
 
-# Create foreground square boundaries
-start_x, end_x, start_y, end_y = create_foreground_square(image_jpg, percentage=10)
 
-# Create background color model from RGB
-avg_color_bg_rgb = create_background_model(image_jpg, bg_value=50)
+# Process only one image
+def process_single_image(image_jpg_path, image_png_path):
+    # Load the image and the corresponding mask
+    image_jpg = cv2.imread(image_jpg_path)
+    image_png = cv2.imread(image_png_path, cv2.IMREAD_GRAYSCALE)
 
-# Classify the image using RGB, HSV, and LAB color spaces
-classified_mask_rgb, classified_mask_hsv, classified_mask_lab = classify_in_multiple_color_spaces(
-    image_jpg, avg_color_bg_rgb, start_x, end_x, start_y, end_y
-)
+    if image_jpg is None or image_png is None:
+        print("Error loading the files.")
+        return
 
-# Set the foreground square to white (255) in all masks
-classified_mask_rgb = set_edge_foreground(classified_mask_rgb, start_x, end_x, start_y, end_y)
-classified_mask_hsv = set_edge_foreground(classified_mask_hsv, start_x, end_x, start_y, end_y)
-classified_mask_lab = set_edge_foreground(classified_mask_lab, start_x, end_x, start_y, end_y)
+    # Create foreground square boundaries
+    start_x, end_x, start_y, end_y = create_foreground_square(image_jpg, percentage=10)
 
-# Save the classified binary masks for visualization
-cv2.imwrite('classified_foreground_rgb.jpg', classified_mask_rgb)
-cv2.imwrite('classified_foreground_hsv.jpg', classified_mask_hsv)
-cv2.imwrite('classified_foreground_lab.jpg', classified_mask_lab)
+    # Create background color model for HSV
+    avg_color_bg_hsv = create_background_model(cv2.cvtColor(image_jpg, cv2.COLOR_BGR2HSV), bg_value=50)
 
-print("Masks for RGB, HSV, and LAB saved.")
+    # Classify the image using HSV color space
+    classified_mask_hsv = classify_in_hsv(image_jpg, avg_color_bg_hsv)
+
+    # Set the foreground square to white (255) in the mask
+    classified_mask_hsv = set_edge_foreground(classified_mask_hsv, start_x, end_x, start_y, end_y)
+
+    # Evaluate the classified mask against the ground truth mask
+    iou_hsv = evaluate_mask(classified_mask_hsv, image_png)
+
+    # Print evaluation results
+    print(f"Results for {os.path.basename(image_jpg_path)}:")
+    print(f"  IoU (HSV): {iou_hsv:.4f}")
+
+    # Save the classified mask
+    # output_path = image_jpg_path.replace('.jpg', '_classified_hsv.png')
+    # cv2.imwrite(output_path, classified_mask_hsv)
+    # print(f"Classified mask saved at {output_path}")
+
+
+# Define paths to the image and mask
+image_jpg_path = 'datasets/qsd2_w1/00002.jpg'
+image_png_path = 'datasets/qsd2_w1/00002.png'
+
+# Process the single image
+process_single_image(image_jpg_path, image_png_path)

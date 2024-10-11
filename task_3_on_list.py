@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 
+
 # Function to create a foreground square (10% of the height and width)
 def create_foreground_square(image, percentage=10):
     height, width, _ = image.shape
@@ -31,7 +32,7 @@ def create_background_model(image, bg_value=50):
     top_strip = image[:bg_value, :, :]          # Top bg_value rows (full width)
     bottom_strip = image[-bg_value:, :, :]      # Bottom bg_value rows (full width)
     left_strip = image[:, :bg_value, :]         # Left bg_value columns (full height)
-    right_strip = image[:, -bg_value:, :]       # Right bg_value columns (full height)
+    right_strip = image[:, -bg_value:, :]       # Right bg_value columns (full width)
 
     # Compute the average color of the top-bottom and left-right regions separately
     avg_color_top_bottom = np.mean(np.vstack((top_strip, bottom_strip)), axis=(0, 1))
@@ -50,7 +51,7 @@ def set_edge_foreground(mask, start_x, end_x, start_y, end_y):
 
 
 # Function to classify the image in RGB, HSV, and LAB color spaces
-def classify_in_multiple_color_spaces(image, avg_color_bg_rgb, threshold=50):
+def classify_in_multiple_color_spaces(image, avg_color_bg_rgb, avg_color_bg_hsv, avg_color_bg_lab, threshold=20):
     height, width, _ = image.shape
     classified_mask_rgb = np.zeros((height, width), dtype=np.uint8)
     classified_mask_hsv = np.zeros((height, width), dtype=np.uint8)
@@ -59,10 +60,6 @@ def classify_in_multiple_color_spaces(image, avg_color_bg_rgb, threshold=50):
     # Convert image to HSV and LAB color spaces
     image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     image_lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-
-    # Convert background average color to HSV and LAB
-    avg_color_bg_hsv = cv2.cvtColor(np.uint8([[avg_color_bg_rgb]]), cv2.COLOR_BGR2HSV)[0][0]
-    avg_color_bg_lab = cv2.cvtColor(np.uint8([[avg_color_bg_rgb]]), cv2.COLOR_BGR2LAB)[0][0]
 
     # Classify each pixel based on distance to background in RGB, HSV, and LAB spaces
     for y in range(height):
@@ -93,8 +90,13 @@ def evaluate_mask(generated_mask, ground_truth_mask):
     return iou
 
 
-# Process all images in the folder
+# Process all images in the folder and accumulate IoU performance
 def process_folder_and_evaluate(image_folder):
+    total_iou_rgb = 0
+    total_iou_hsv = 0
+    total_iou_lab = 0
+    num_images = 0
+
     # Iterate over all .jpg images in the folder
     for filename in os.listdir(image_folder):
         if filename.endswith('.jpg'):
@@ -105,15 +107,21 @@ def process_folder_and_evaluate(image_folder):
             image_jpg = cv2.imread(image_jpg_path)
             image_png = cv2.imread(image_png_path, cv2.IMREAD_GRAYSCALE)
 
+            if image_jpg is None or image_png is None:
+                print(f"Error loading {filename}, skipping.")
+                continue
+
             # Create foreground square boundaries
             start_x, end_x, start_y, end_y = create_foreground_square(image_jpg, percentage=10)
 
-            # Create background color model from RGB
+            # Create background color models for RGB, HSV, and LAB
             avg_color_bg_rgb = create_background_model(image_jpg, bg_value=50)
+            avg_color_bg_hsv = create_background_model(cv2.cvtColor(image_jpg, cv2.COLOR_BGR2HSV), bg_value=50)
+            avg_color_bg_lab = create_background_model(cv2.cvtColor(image_jpg, cv2.COLOR_BGR2LAB), bg_value=50)
 
             # Classify the image using RGB, HSV, and LAB color spaces
             classified_mask_rgb, classified_mask_hsv, classified_mask_lab = classify_in_multiple_color_spaces(
-                image_jpg, avg_color_bg_rgb
+                image_jpg, avg_color_bg_rgb, avg_color_bg_hsv, avg_color_bg_lab
             )
 
             # Set the foreground square to white (255) in all masks
@@ -126,11 +134,35 @@ def process_folder_and_evaluate(image_folder):
             iou_hsv = evaluate_mask(classified_mask_hsv, image_png)
             iou_lab = evaluate_mask(classified_mask_lab, image_png)
 
-            # Print evaluation results
+            # Print evaluation results for the image
             print(f"Results for {filename}:")
             print(f"  IoU (RGB): {iou_rgb:.4f}")
             print(f"  IoU (HSV): {iou_hsv:.4f}")
             print(f"  IoU (LAB): {iou_lab:.4f}")
+
+            # Save the classified masks
+            # cv2.imwrite(os.path.join(image_folder, f'classified_{filename[:-4]}_rgb.png'), classified_mask_rgb)
+            # cv2.imwrite(os.path.join(image_folder, f'classified_{filename[:-4]}_hsv.png'), classified_mask_hsv)
+            # cv2.imwrite(os.path.join(image_folder, f'classified_{filename[:-4]}_lab.png'), classified_mask_lab)
+
+            # Accumulate the IoU for overall performance
+            total_iou_rgb += iou_rgb
+            total_iou_hsv += iou_hsv
+            total_iou_lab += iou_lab
+            num_images += 1
+
+    # Compute and print the average IoU performance over all images
+    if num_images > 0:
+        avg_iou_rgb = total_iou_rgb / num_images
+        avg_iou_hsv = total_iou_hsv / num_images
+        avg_iou_lab = total_iou_lab / num_images
+
+        print("\nOverall Performance:")
+        print(f"  Average IoU (RGB): {avg_iou_rgb:.4f}")
+        print(f"  Average IoU (HSV): {avg_iou_hsv:.4f}")
+        print(f"  Average IoU (LAB): {avg_iou_lab:.4f}")
+    else:
+        print("No valid images were processed.")
 
 
 # Define folder containing the images
