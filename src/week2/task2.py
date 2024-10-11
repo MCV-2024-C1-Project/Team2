@@ -4,8 +4,8 @@ import pickle
 
 import utils
 
-directory = '../../datasets/qsd1_w1/'
-directory_bbdd = '../../data/BBDD/'
+directory = 'datasets/qsd1_w1/week2'
+directory_bbdd = 'data/BBDD/week2'
 
 def extract_number_from_filename(filename):
     '''Function to extract the number of the image'''
@@ -90,7 +90,7 @@ for hist_key in histogram_keys:
         # Flatten the results for comparison with ground truth
         predicted_flattened_k_5 = [p for p in list_results_k_5]
 
-        with open(f'../../datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
+        with open(f'datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
             ground_truth = pickle.load(f)
 
         # Print the MAP@k results for the current histogram key with the current distance function
