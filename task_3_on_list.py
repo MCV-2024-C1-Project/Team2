@@ -25,7 +25,7 @@ def create_foreground_square(image, percentage=10):
 
 
 # Function to create a background model from the edges
-def create_background_model(image, bg_value=50):
+def create_background_model(image, bg_value=20):
     height, width, _ = image.shape
 
     # Get the pixels from the specified number of pixels from the edges
@@ -51,7 +51,7 @@ def set_edge_foreground(mask, start_x, end_x, start_y, end_y):
 
 
 # Function to classify the image in RGB, HSV, and LAB color spaces
-def classify_in_multiple_color_spaces(image, avg_color_bg_rgb, avg_color_bg_hsv, avg_color_bg_lab, threshold=20):
+def classify_in_multiple_color_spaces(image, avg_color_bg_rgb, avg_color_bg_hsv, avg_color_bg_lab, threshold=50):
     height, width, _ = image.shape
     classified_mask_rgb = np.zeros((height, width), dtype=np.uint8)
     classified_mask_hsv = np.zeros((height, width), dtype=np.uint8)
