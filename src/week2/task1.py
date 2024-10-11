@@ -3,7 +3,49 @@ import numpy as np
 import os
 import pickle
 
-def spatial_pyramid_histogram(image, levels=2, hist_size=8, hist_range=[0,256]):
+
+def hsv_hist3D(image):
+    """
+    Compute HSV 3D histogram from an image
+    """
+    # 180 bins for hue do the the fact that opencv stores hue in 180 bins
+    num_bins = [180, 256, 256]
+
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+
+    hsv_hist3D = cv2.calcHist([hsv_image], [0, 1, 2], None, num_bins, [0, 180, 0, 256, 0, 256])
+
+    normalized = cv2.normalize(hsv_hist3D, hsv_hist3D, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+
+    # Flatten the 3D histogram into a 1D vector
+    flattened_hist = normalized.flatten()
+
+    return flattened_hist
+
+def lab_hist3D(image):
+    """
+    Compute Lab 3D histogram from an image and flatten it into a 1D vector.
+    """
+    # Define number of bins for each channel (L, A, B)
+    num_bins = [256, 256, 256]  # 256 bins for each channel (L, A, B)
+    
+    # Convert image from RGB (OpenCV default BGR) to Lab color space
+    lab_image = cv2.cvtColor(image, cv2.COLOR_RGB2Lab)
+    
+    # Compute 3D histogram over the Lab channels
+    lab_hist3D = cv2.calcHist([lab_image], [0, 1, 2], None, num_bins, [0, 256, 0, 256, 0, 256])
+    
+    # Normalize the histogram (to the range [0, 1] with NORM_MINMAX)
+    normalized = cv2.normalize(lab_hist3D, lab_hist3D, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+
+    # Flatten the 3D histogram into a 1D vector
+    flattened_hist = normalized.flatten()
+
+    return flattened_hist
+
+
+
+def spatial_pyramid_histogram(image, levels=2, hist_size=8, hist_range=[0,255]):
     """
     Compute a spatial pyramid representation of histograms, with concatenation of histograms per channel.
     Level zero has 1 block. 2^0=1 so blocks 1*1=1
@@ -12,6 +54,8 @@ def spatial_pyramid_histogram(image, levels=2, hist_size=8, hist_range=[0,256]):
     """
 
     pyramid_hist = []
+    # resize image to 256*256
+    image = cv2.resize(image, (256, 256), interpolation = cv2.INTER_AREA)
     h, w = image.shape[:2]  # Get the height and width of the image
     channels = 1 if len(image.shape) == 2 else image.shape[2]  # Check number of channels
 
@@ -95,7 +139,7 @@ def process_directory(directory_path):
                 'hist_HSV_256': hist_HSV_256,
             }
 
-
+            directory_path = os.path.join(directory_path, '/week2')
             pkl_filename = os.path.splitext(filename)[0] + '_w2.pkl'
             pkl_path = os.path.join(directory_path, pkl_filename)
             #print(pkl_path)
