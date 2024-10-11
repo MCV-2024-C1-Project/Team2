@@ -3,27 +3,6 @@ import numpy as np
 import os
 
 
-# Function to create a foreground square (10% of the height and width)
-def create_foreground_square(image, percentage=10):
-    height, width, _ = image.shape
-
-    # Calculate the dimensions of the square (10% of height and width)
-    square_height = int(height * (percentage / 100))
-    square_width = int(width * (percentage / 100))
-
-    # Calculate the center of the image
-    center_x = width // 2
-    center_y = height // 2
-
-    # Calculate the coordinates of the square (centered)
-    start_x = center_x - square_width // 2
-    end_x = center_x + square_width // 2
-    start_y = center_y - square_height // 2
-    end_y = center_y + square_height // 2
-
-    return start_x, end_x, start_y, end_y
-
-
 # Function to create a background model from the edges
 def create_background_model(image, bg_value=20):
     height, width, _ = image.shape
@@ -42,12 +21,6 @@ def create_background_model(image, bg_value=20):
     avg_color_bg = (avg_color_top_bottom + avg_color_left_right) / 2
 
     return avg_color_bg
-
-
-# Function to set the foreground square to white (255)
-def set_edge_foreground(mask, start_x, end_x, start_y, end_y):
-    mask[start_y:end_y, start_x:end_x] = 255  # Set the foreground square to white
-    return mask
 
 
 # Function to calculate precision, recall, and F1-score
@@ -94,9 +67,6 @@ def process_folder_and_evaluate(image_folder):
                 print(f"Error loading {filename}, skipping.")
                 continue
 
-            # Create foreground square boundaries
-            start_x, end_x, start_y, end_y = create_foreground_square(image_jpg, percentage=10)
-
             # Create background color models for HSV
             avg_color_bg_hsv = create_background_model(cv2.cvtColor(image_jpg, cv2.COLOR_BGR2HSV), bg_value=50)
 
@@ -109,9 +79,6 @@ def process_folder_and_evaluate(image_folder):
                     pixel_hsv = image_hsv[y, x]
                     dist_to_bg_hsv = np.linalg.norm(pixel_hsv - avg_color_bg_hsv)
                     classified_mask_hsv[y, x] = 255 if dist_to_bg_hsv > 50 else 0
-
-            # Set the foreground square to white (255)
-            classified_mask_hsv = set_edge_foreground(classified_mask_hsv, start_x, end_x, start_y, end_y)
 
             # Evaluate the classified masks against the ground truth mask using precision, recall, and F1-score
             precision_hsv, recall_hsv, f1_hsv = evaluate_mask_precision_recall_f1(classified_mask_hsv, image_png)

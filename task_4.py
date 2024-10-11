@@ -3,27 +3,6 @@ import numpy as np
 import os
 
 
-# Function to create a foreground square (10% of the height and width)
-def create_foreground_square(image, percentage=10):
-    height, width, _ = image.shape
-
-    # Calculate the dimensions of the square (10% of height and width)
-    square_height = int(height * (percentage / 100))
-    square_width = int(width * (percentage / 100))
-
-    # Calculate the center of the image
-    center_x = width // 2
-    center_y = height // 2
-
-    # Calculate the coordinates of the square (centered)
-    start_x = center_x - square_width // 2
-    end_x = center_x + square_width // 2
-    start_y = center_y - square_height // 2
-    end_y = center_y + square_height // 2
-
-    return start_x, end_x, start_y, end_y
-
-
 # Function to create a background model from the edges
 def create_background_model(image, bg_value=20):
     height, width, _ = image.shape
@@ -42,12 +21,6 @@ def create_background_model(image, bg_value=20):
     avg_color_bg = (avg_color_top_bottom + avg_color_left_right) / 2
 
     return avg_color_bg
-
-
-# Function to set the foreground square to white (255)
-def set_edge_foreground(mask, start_x, end_x, start_y, end_y):
-    mask[start_y:end_y, start_x:end_x] = 255  # Set the foreground square to white
-    return mask
 
 
 # Function to classify the image in HSV color space
@@ -101,17 +74,11 @@ def process_single_image(image_jpg_path, image_png_path):
         print("Error loading the files.")
         return
 
-    # Create foreground square boundaries
-    start_x, end_x, start_y, end_y = create_foreground_square(image_jpg, percentage=10)
-
     # Create background color model for HSV
     avg_color_bg_hsv = create_background_model(cv2.cvtColor(image_jpg, cv2.COLOR_BGR2HSV), bg_value=50)
 
     # Classify the image using HSV color space
     classified_mask_hsv = classify_in_hsv(image_jpg, avg_color_bg_hsv)
-
-    # Set the foreground square to white (255) in the mask
-    classified_mask_hsv = set_edge_foreground(classified_mask_hsv, start_x, end_x, start_y, end_y)
 
     # Evaluate the classified mask against the ground truth mask
     precision, recall, f1_score = evaluate_mask_precision_recall_f1(classified_mask_hsv, image_png)
@@ -123,9 +90,9 @@ def process_single_image(image_jpg_path, image_png_path):
     print(f"  F1-score (HSV): {f1_score:.4f}")
 
     # Save the classified mask
-    output_path = image_jpg_path.replace('.jpg', '_classified_hsv.png')
-    cv2.imwrite(output_path, classified_mask_hsv)
-    print(f"Classified mask saved at {output_path}")
+    # output_path = image_jpg_path.replace('.jpg', '_classified_hsv.png')
+    # cv2.imwrite(output_path, classified_mask_hsv)
+    # print(f"Classified mask saved at {output_path}")
 
 
 # Define paths to the image and mask
