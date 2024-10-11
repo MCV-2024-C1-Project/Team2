@@ -95,19 +95,15 @@ def process_directory(directory_path):
                 'hist_HSV_256': hist_HSV_256,
             }
 
-            # Verify if the folder is BBDD to add '_w2' to the pickle path so to no delete the pickles from the last week
-            if directory_path == "../../data/BBDD":
-                pkl_filename = os.path.splitext(filename)[0] + '_w2.pkl'
-            else:
-                pkl_filename = os.path.splitext(filename)[0] + '.pkl'
 
+            pkl_filename = os.path.splitext(filename)[0] + '_w2.pkl'
             pkl_path = os.path.join(directory_path, pkl_filename)
             #print(pkl_path)
             with open(pkl_path, 'wb') as pkl_file:
                 pickle.dump(histograms, pkl_file)
 
 # process both folders
-directory_query1 = "../../datasets/qsd1_w2/"
+directory_query1 = "../../datasets/qsd1_w1/"
 directory_query2 = "../../data/BBDD"
 
 print("Processing directory 1:")

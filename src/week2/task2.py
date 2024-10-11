@@ -4,7 +4,7 @@ import pickle
 
 import utils
 
-directory = '../../datasets/qsd1_w2/'
+directory = '../../datasets/qsd1_w1/'
 directory_bbdd = '../../data/BBDD/'
 
 def extract_number_from_filename(filename):
@@ -15,7 +15,7 @@ def extract_number_from_filename(filename):
 
 def extract_number_from_filename_qsd1_w1(filename):
     '''Function to extract the number of the image'''
-    match = re.search(r'(\d+)\.pkl', filename)
+    match = re.search(r'(\d{5})_w2\.pkl', filename)
     if match:
         return int(match.group(1))
 
@@ -52,7 +52,7 @@ for hist_key in histogram_keys:
 
         # Loop over each file to compare
         for file_compare_image in files_sorted:
-            if file_compare_image.endswith('.pkl') and file_compare_image != 'gt_corresps.pkl':
+            if file_compare_image.endswith('_w2.pkl') and file_compare_image != 'gt_corresps.pkl':
                 pkl_grey_path = os.path.join(directory, file_compare_image)
                 with open(pkl_grey_path, 'rb') as pkl_file:
                     histograms_first = pickle.load(pkl_file)
@@ -90,7 +90,7 @@ for hist_key in histogram_keys:
         # Flatten the results for comparison with ground truth
         predicted_flattened_k_5 = [p for p in list_results_k_5]
 
-        with open(f'../../datasets/qsd1_w2/gt_corresps.pkl', 'rb') as f:
+        with open(f'../../datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
             ground_truth = pickle.load(f)
 
         # Print the MAP@k results for the current histogram key with the current distance function
