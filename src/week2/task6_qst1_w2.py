@@ -85,7 +85,6 @@ def process_directory(directory_path):
                 pickle.dump(histograms, pkl_file)
 
 
-
 # process both folders
 directory_test1 = "../../datasets/qst1_w2"
 print("Current working directory:", os.getcwd())
@@ -95,17 +94,20 @@ process_directory(directory_test1)
 directory = '../../datasets/qst1_w2'
 directory_bbdd = '../../data/BBDD/week2'
 
+
 def extract_number_from_filename(filename):
     '''Function to extract the number of the image'''
     match = re.search(r'bbdd_(\d{5})_w2\.pkl', filename)
     if match:
         return int(match.group(1))
 
+
 def extract_number_from_filename_qsd1_w1(filename):
     '''Function to extract the number of the image'''
     match = re.search(r'(\d{5})_w2\.pkl', filename)
     if match:
         return int(match.group(1))
+
 
 # Method 1
 min_distance = float('inf')
@@ -135,7 +137,7 @@ for file_compare_image in files_sorted:
                 histogram_first_grey = histograms_first['hist_LAB_32_2D']
                 histogram_grey = histograms['hist_LAB_32_2D']
                 # # Try all 4 loss functions: euc_dist, L1_dist, X2_distance, hellinger_kernel, histogram_similiarity
-                distance = utils.our_metric(histogram_first_grey, histogram_grey)
+                distance = utils.hellinger_kernel(histogram_first_grey, histogram_grey)
 
                 index = extract_number_from_filename(filename)
 
@@ -155,6 +157,8 @@ predicted_flattened_k_10 = [p for p in list_results_k_10]
 
 # To ensure that they are integers
 list_results_k_10_enteros = [[int(x) for x in sublist] for sublist in list_results_k_10]
+
+print(list_results_k_10_enteros)
 
 # store results k=10
 with open('../../results/week2/QST1/method1/result.pkl', 'wb') as pkl_file:
