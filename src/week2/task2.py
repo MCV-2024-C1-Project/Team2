@@ -21,10 +21,9 @@ def extract_number_from_filename_qsd1_w1(filename):
 
 # Define the histogram keys and distance functions
 histogram_keys = [
-    'hist_grey_8', 'hist_grey_128', 'hist_grey_256',
-    'hist_RGB_8', 'hist_RGB_128', 'hist_RGB_256',
-    'hist_LAB_8', 'hist_LAB_128', 'hist_LAB_256',
-    'hist_HSV_8', 'hist_HSV_128', 'hist_HSV_256'
+    'hist_RGB_8_2D', 'hist_RGB_8_3D', 'hist_RGB_128_2D', 'hist_RGB_128_3D',
+    'hist_LAB_8_2D', 'hist_LAB_8_3D', 'hist_LAB_128_2D', 'hist_LAB_128_3D',
+    'hist_HSV_8_2D', 'hist_HSV_8_3D', 'hist_HSV_128_2D', 'hist_HSV_128_3D',
 ]
 
 distance_functions = {

@@ -45,7 +45,7 @@ def lab_hist3D(image):
 
 
 
-def spatial_pyramid_histogram(image, levels=2, hist_size=8, hist_range=[0,255]):
+def spatial_pyramid_histogram(image, levels=2, dimensions=True,hist_size=[8,8], hist_range=[0,256,0,256]):
     """
     Compute a spatial pyramid representation of histograms, with concatenation of histograms per channel.
     Level zero has 1 block. 2^0=1 so blocks 1*1=1
@@ -57,7 +57,6 @@ def spatial_pyramid_histogram(image, levels=2, hist_size=8, hist_range=[0,255]):
     # resize image to 256*256
     image = cv2.resize(image, (256, 256), interpolation = cv2.INTER_AREA) # NEEDS DISCUSSION
     h, w = image.shape[:2]  # Get the height and width of the image
-    channels = 1 if len(image.shape) == 2 else image.shape[2]  # Check number of channels
 
     # Loop through each level in the pyramid
     for level in range(levels + 1):
@@ -71,18 +70,22 @@ def spatial_pyramid_histogram(image, levels=2, hist_size=8, hist_range=[0,255]):
                 #print(f'block ' + str(i) +' : '+ str(j))
                 # Compute histograms depending on the number of channels
                 block_hist = []
-                if channels == 1:
-                    # Single-channel image (grayscale)
-                    hist = cv2.calcHist([block], [0], None, [hist_size], hist_range) 
-                    hist /= hist.sum()  # Normalize the histogram
-                    block_hist.append(hist.flatten())
+                if dimensions == True:
+                    # Compute 2D histogram 
+                    lab_hist2D = cv2.calcHist([block], [0, 1], None, hist_size, hist_range)
+                    # Normalize the histogram (to the range [0, 1] with NORM_MINMAX)
+                    normalized = cv2.normalize(lab_hist2D, lab_hist2D, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+                    # Flatten the 2D histogram into a 1D vector
+                    flattened_hist = normalized.flatten()
+                    block_hist.append(flattened_hist)
                 else:
-                    # Multi-channel image (e.g., BGR)
-                    for ch in range(channels):
-                        #print(f'channel'+str(ch))
-                        hist = cv2.calcHist([block], [ch], None, [hist_size], hist_range) # I would change this block with hsv_hist3D(image)
-                        hist /= hist.sum()  # Normalize the histogram
-                        block_hist.append(hist.flatten())
+                    # Compute 3D histogram 
+                    lab_hist3D = cv2.calcHist([block], [0, 1, 2], None, hist_size, hist_range)
+                    # Normalize the histogram (to the range [0, 1] with NORM_MINMAX)
+                    normalized = cv2.normalize(lab_hist3D, lab_hist3D, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+                    # Flatten the 3D histogram into a 1D vector
+                    flattened_hist = normalized.flatten()
+                    block_hist.append(flattened_hist)
 
                 # Concatenate histograms for this block
                 block_hist = np.concatenate(block_hist)
@@ -97,52 +100,60 @@ def process_directory(directory_path):
     for filename in os.listdir(directory_path):
         if filename.endswith('.jpg'):
             img_path = os.path.join(directory_path, filename)
-            # Extract descriptors from image greyscale
-            img_grey = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-            # Compute spatial pyramid histogram 
-            hist_grey_8 = spatial_pyramid_histogram(img_grey, levels=2, hist_size=8, hist_range=[0, 256])
-            hist_grey_128 = spatial_pyramid_histogram(img_grey, levels=2, hist_size=128, hist_range=[0, 256])
-            hist_grey_256 = spatial_pyramid_histogram(img_grey, levels=2, hist_size=256, hist_range=[0, 256])
 
             # Extract descriptors from RGB channels
             img_BGR = cv2.imread(img_path)
             img_RGB = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)
-            hist_RGB_8 = spatial_pyramid_histogram(img_RGB, levels=2, hist_size=8, hist_range=[0, 256])
-            hist_RGB_128 = spatial_pyramid_histogram(img_RGB, levels=2, hist_size=128, hist_range=[0, 256])
-            hist_RGB_256 = spatial_pyramid_histogram(img_RGB, levels=2, hist_size=256, hist_range=[0, 256])
+            hist_RGB_8_2D = spatial_pyramid_histogram(img_RGB, levels=2, dimensions=True,hist_size=[8,8], hist_range=[0, 256,0, 256])
+            hist_RGB_8_3D = spatial_pyramid_histogram(img_RGB, levels=2, dimensions=False,hist_size=[8,8,8], hist_range=[0, 256,0, 256,0, 256])
+            hist_RGB_128_2D = spatial_pyramid_histogram(img_RGB, levels=2, dimensions=True, hist_size=[128,128], hist_range=[0, 256,0, 256])
+            hist_RGB_128_3D = spatial_pyramid_histogram(img_RGB, levels=2, dimensions=False, hist_size=[128,128,128], hist_range=[0, 256,0, 256,0, 256])
+            # hist_RGB_256_2D = spatial_pyramid_histogram(img_RGB, levels=2, dimensions=True, hist_size=[256,256], hist_range=[0, 256,0, 256])
+            # hist_RGB_256_3D = spatial_pyramid_histogram(img_RGB, levels=2, dimensions=False, hist_size=[256,256,256], hist_range=[0, 256,0, 256,0, 256])
 
             #CieLab
             img_LAB = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2LAB)
-            hist_LAB_8 = spatial_pyramid_histogram(img_LAB, levels=2, hist_size=8, hist_range=[0, 256])
-            hist_LAB_128 = spatial_pyramid_histogram(img_LAB, levels=2, hist_size=128, hist_range=[0, 256])
-            hist_LAB_256 = spatial_pyramid_histogram(img_LAB, levels=2, hist_size=256, hist_range=[0, 256])
+            hist_LAB_8_2D = spatial_pyramid_histogram(img_LAB, levels=2, dimensions=True,hist_size=[8,8], hist_range=[0, 256,0, 256])
+            hist_LAB_8_3D = spatial_pyramid_histogram(img_LAB, levels=2, dimensions=False,hist_size=[8,8,8], hist_range=[0, 256,0, 256,0, 256])
+            hist_LAB_128_2D = spatial_pyramid_histogram(img_LAB, levels=2, dimensions=True, hist_size=[128,128], hist_range=[0, 256,0, 256])
+            hist_LAB_128_3D = spatial_pyramid_histogram(img_LAB, levels=2, dimensions=False, hist_size=[128,128,128], hist_range=[0, 256,0, 256,0, 256])
+            # hist_LAB_256_2D = spatial_pyramid_histogram(img_LAB, levels=2, dimensions=True, hist_size=[256,256], hist_range=[0, 256,0, 256])
+            # hist_LAB_256_3D = spatial_pyramid_histogram(img_LAB, levels=2, dimensions=False, hist_size=[256,256,256], hist_range=[0, 256,0, 256,0, 256])
 
             #HSV
             img_HSV = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
-            hist_HSV_8 = spatial_pyramid_histogram(img_HSV, levels=2, hist_size=8, hist_range=[0, 256])
-            hist_HSV_128 = spatial_pyramid_histogram(img_HSV, levels=2, hist_size=128, hist_range=[0, 256])
-            hist_HSV_256 = spatial_pyramid_histogram(img_HSV, levels=2, hist_size=256, hist_range=[0, 256])
-
+            hist_HSV_8_2D = spatial_pyramid_histogram(img_HSV, levels=2, dimensions=True,hist_size=[8,8], hist_range=[0, 180,0, 256])
+            hist_HSV_8_3D = spatial_pyramid_histogram(img_HSV, levels=2, dimensions=False,hist_size=[8,8,8], hist_range=[0, 180,0, 256,0, 256])
+            hist_HSV_128_2D = spatial_pyramid_histogram(img_HSV, levels=2, dimensions=True, hist_size=[128,128], hist_range=[0, 180,0, 256])
+            hist_HSV_128_3D = spatial_pyramid_histogram(img_HSV, levels=2, dimensions=False, hist_size=[128,128,128], hist_range=[0, 180,0, 256,0, 256])
+            # hist_HSV_256_2D = spatial_pyramid_histogram(img_HSV, levels=2, dimensions=True, hist_size=[256,256], hist_range=[0, 256,0, 256])
+            # hist_HSV_256_3D = spatial_pyramid_histogram(img_HSV, levels=2, dimensions=False, hist_size=[256,256,256], hist_range=[0, 256,0, 256,0, 256])
 
             histograms = {
-                'hist_grey_8': hist_grey_8,
-                'hist_grey_128': hist_grey_128,
-                'hist_grey_256': hist_grey_256,
-                'hist_RGB_8': hist_RGB_8,
-                'hist_RGB_128': hist_RGB_128,
-                'hist_RGB_256': hist_RGB_256,
-                'hist_LAB_8': hist_LAB_8,
-                'hist_LAB_128': hist_LAB_128,
-                'hist_LAB_256': hist_LAB_256,
-                'hist_HSV_8': hist_HSV_8,
-                'hist_HSV_128': hist_HSV_128,
-                'hist_HSV_256': hist_HSV_256,
+                'hist_RGB_8_2D': hist_RGB_8_2D,
+                'hist_RGB_8_3D': hist_RGB_8_3D,
+                'hist_RGB_128_2D': hist_RGB_128_2D,
+                'hist_RGB_128_3D': hist_RGB_128_3D,
+                # 'hist_RGB_256_2D': hist_RGB_256_2D,
+                # 'hist_RGB_256_3D': hist_RGB_256_3D,
+                'hist_LAB_8_2D': hist_LAB_8_2D,
+                'hist_LAB_8_3D': hist_LAB_8_3D,
+                'hist_LAB_128_2D': hist_LAB_128_2D,
+                'hist_LAB_128_3D': hist_LAB_128_3D,
+                # 'hist_LAB_256_2D': hist_LAB_256_2D,
+                # 'hist_LAB_256_3D': hist_LAB_256_3D,
+                'hist_HSV_8_2D': hist_HSV_8_2D,
+                'hist_HSV_8_3D': hist_HSV_8_3D,
+                'hist_HSV_128_2D': hist_HSV_128_2D,
+                'hist_HSV_128_3D': hist_HSV_128_3D,
+                # 'hist_HSV_256_2D': hist_HSV_256_2D,
+                # 'hist_HSV_256_3D': hist_HSV_256_3D,
             }
 
             save_path = directory_path + '/week2'
             pkl_filename = os.path.splitext(filename)[0] + '_w2.pkl'
             pkl_path = os.path.join(save_path, pkl_filename)
-            #print(pkl_path)
+            print(pkl_path)
             with open(pkl_path, 'wb') as pkl_file:
                 pickle.dump(histograms, pkl_file)
 
