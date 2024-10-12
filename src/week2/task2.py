@@ -110,5 +110,5 @@ for hist_key in histogram_keys:
 results_df = results_df.sort_values(by='k1', ascending=False)
 
 # Guardar el DataFrame en un archivo CSV
-results_df.to_csv('mapk_results.csv', index=False)
+results_df.to_csv('../../mapk_results.csv', index=False)
 print("Finished processing all histogram keys and distance functions.")
