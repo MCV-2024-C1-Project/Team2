@@ -103,14 +103,13 @@ def process_directory(directory_path):
                 pickle.dump(histograms, pkl_file)
 
 
-
 # process both folders
 directory_query1 = "image_without_background"
 directory = 'image_without_background'
 directory_bbdd = 'data/BBDD/week2'
 print("Current working directory:", os.getcwd())
 print("Processing directory 1:")
-#process_directory(directory_query1)
+process_directory(directory_query1)
 
 def extract_number_from_filename(filename):
     '''Function to extract the number of the image'''

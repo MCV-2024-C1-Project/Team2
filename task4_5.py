@@ -94,7 +94,7 @@ def morphologically_close_mask(mask):
 
 
 # Process all images in the folder and accumulate Precision, Recall, and F1-score
-def process_folder_and_evaluate(image_folder, output_folder,mask_path):
+def process_folder_and_evaluate(image_folder, output_folder, mask_path):
     total_precision_hsv = 0
     total_recall_hsv = 0
     total_f1_hsv = 0
@@ -134,7 +134,6 @@ def process_folder_and_evaluate(image_folder, output_folder,mask_path):
             # Clean the mask to remove small black lines
             cleaned_mask = clean_mask(classified_mask_hsv, threshold=0.8)
 
-            
             # Apply morphological closing to fill small holes in the mask
             closed_mask = morphologically_close_mask(cleaned_mask)
 
@@ -146,7 +145,7 @@ def process_folder_and_evaluate(image_folder, output_folder,mask_path):
             # Save the image without background (in PNG format with transparency)
             cv2.imwrite(output_path, image_without_background)
             print(f"Saved image without background: {output_path}")
-            
+
             closed_mask_path = os.path.join(mask_path, filename.replace('.jpg', '.png'))
             cv2.imwrite(closed_mask_path, closed_mask)
             print(f"Saved closed mask: {closed_mask_path}")
@@ -178,9 +177,9 @@ def process_folder_and_evaluate(image_folder, output_folder,mask_path):
 
 
 # Define folder containing the images and the output folder
-image_folder = 'datasets/qsd2_w1'
+image_folder = 'datasets/qsd2_w2'
 output_folder = 'image_without_background'
-mask_path='results/week2/QST2/method1'
+mask_path = 'results/week2/QST2/method1'
 
 # Process the folder and save the results in the new folder
-process_folder_and_evaluate(image_folder, output_folder,mask_path)
+process_folder_and_evaluate(image_folder, output_folder, mask_path)
