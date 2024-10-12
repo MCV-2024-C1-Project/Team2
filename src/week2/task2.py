@@ -1,11 +1,11 @@
 import re
 import os
 import pickle
-
+import pandas as pd
 import utils
 
-directory = 'datasets/qsd1_w1/week2'
-directory_bbdd = 'data/BBDD/week2'
+directory = '../../datasets/qsd1_w1/week2'
+directory_bbdd = '../../data/BBDD/week2'
 
 def extract_number_from_filename(filename):
     '''Function to extract the number of the image'''
@@ -21,9 +21,8 @@ def extract_number_from_filename_qsd1_w1(filename):
 
 # Define the histogram keys and distance functions
 histogram_keys = [
-    'hist_RGB_8_2D', 'hist_RGB_8_3D', 'hist_RGB_128_2D', 'hist_RGB_128_3D',
-    'hist_LAB_8_2D', 'hist_LAB_8_3D', 'hist_LAB_128_2D', 'hist_LAB_128_3D',
-    'hist_HSV_8_2D', 'hist_HSV_8_3D', 'hist_HSV_128_2D', 'hist_HSV_128_3D',
+    'hist_LAB_8_1D','hist_LAB_8_2D', 'hist_LAB_8_3D', 'hist_LAB_32_2D', 'hist_LAB_32_3D',
+    'hist_HSV_8_1D','hist_HSV_8_2D', 'hist_HSV_8_3D', 'hist_HSV_32_2D', 'hist_HSV_32_3D',
 ]
 
 distance_functions = {
@@ -31,10 +30,9 @@ distance_functions = {
     'X2_distance': utils.X2_distance,
     'L1_dist': utils.L1_dist,
     'euc_dist': utils.euc_dist,
-    'histogram_similarity': utils.histogram_similiarity,
     'hellinger_kernel': utils.hellinger_kernel
 }
-
+results_df = pd.DataFrame(columns=['hist_key', 'metric_name', 'k1', 'k5'])
 # Loop over each histogram key
 for hist_key in histogram_keys:
     print(f"Processing histogram key: {hist_key}")
@@ -89,13 +87,28 @@ for hist_key in histogram_keys:
         # Flatten the results for comparison with ground truth
         predicted_flattened_k_5 = [p for p in list_results_k_5]
 
-        with open(f'datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
+        with open(f'../../datasets/qsd1_w1/gt_corresps.pkl', 'rb') as f:
             ground_truth = pickle.load(f)
 
         # Print the MAP@k results for the current histogram key with the current distance function
         mapk_k1 = utils.mapk(ground_truth, list_results_k_1, k=1)
         mapk_k5 = utils.mapk(ground_truth, predicted_flattened_k_5, k=5)
+
+        temp_df = pd.DataFrame({
+            'hist_key': [hist_key],
+            'metric_name': [metric_name],
+            'k1': [mapk_k1],
+            'k5': [mapk_k5]
+        })
+
+        # Concatenar los resultados al DataFrame principal
+        results_df = pd.concat([results_df, temp_df], ignore_index=True)
+
         print(f"    {hist_key} with {metric_name}; k=1 mapk: {mapk_k1}")
         print(f"    {hist_key} with {metric_name}; k=5 mapk: {mapk_k5}")
+# Ordenar el DataFrame por el valor de k=1 en orden descendente
+results_df = results_df.sort_values(by='k1', ascending=False)
 
+# Guardar el DataFrame en un archivo CSV
+results_df.to_csv('mapk_results.csv', index=False)
 print("Finished processing all histogram keys and distance functions.")
