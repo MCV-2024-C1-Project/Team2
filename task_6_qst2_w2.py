@@ -2,9 +2,11 @@ import cv2
 import numpy as np
 import os
 import pandas as pd
-import pickle 
+import pickle
 import utils
 import re
+
+
 # Function to create a background model from the edges
 def create_background_model(image, bg_value=20):
     height, width, _ = image.shape
@@ -19,6 +21,8 @@ def create_background_model(image, bg_value=20):
     # Combine the two averages to form the final background model
     avg_color_bg = (avg_color_top_bottom + avg_color_left_right) / 2
     return avg_color_bg
+
+
 # Function to calculate precision, recall, and F1-score
 def evaluate_mask_precision_recall_f1(generated_mask, ground_truth_mask):
     # True Positive (TP): Both ground truth and predicted are foreground
@@ -34,21 +38,25 @@ def evaluate_mask_precision_recall_f1(generated_mask, ground_truth_mask):
     # F1-score: 2 * (Precision * Recall) / (Precision + Recall)
     f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
     return precision, recall, f1_score
+
+
 # Function to remove background from the image using the classified mask
 def remove_background(image, mask):
     # Convert the mask to 3 channels to apply it to the original image
     mask_3channel = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-    
+
     # Apply the mask to the image (bitwise_and keeps only the foreground pixels)
     image_without_bg = cv2.bitwise_and(image, mask_3channel)
-    
+
     # Create an alpha channel (transparency mask)
     alpha_channel = np.where(mask == 255, 255, 0).astype(np.uint8)  # Foreground is opaque, background is transparent
-    
+
     # Add the alpha channel to the image
     image_with_alpha = cv2.merge([image_without_bg[:, :, 0], image_without_bg[:, :, 1], image_without_bg[:, :, 2], alpha_channel])
-    
+
     return image_with_alpha
+
+
 # Function to clean up the mask by removing small black lines
 def clean_mask(mask, threshold=0.8):
     # Iterate over each row (horizontal lines)
@@ -66,12 +74,16 @@ def clean_mask(mask, threshold=0.8):
         if black_pixel_percentage > threshold:
             mask[:, x] = 0
     return mask
+
+
 def morphologically_close_mask(mask):
     # Define a kernel for the morphological operations
     kernel = np.ones((5, 5), np.uint8)  # You can adjust the size of the kernel
     # Apply closing (dilate followed by erode) to fill small holes
     closed_mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
     return closed_mask
+
+
 # Process all images in the folder and accumulate Precision, Recall, and F1-score
 def process_folder_and_evaluate(image_folder, output_folder, mask_path):
     total_precision_hsv = 0
@@ -115,12 +127,20 @@ def process_folder_and_evaluate(image_folder, output_folder, mask_path):
             cv2.imwrite(closed_mask_path, closed_mask)
             print(f"Saved closed mask: {closed_mask_path}")
 
-# Define folder containing the images and the output folder
-image_folder = 'datasets/qst2_w2'
-output_folder = 'image_without_background_test'
-mask_path = 'results/week2/QST2/method1'
-# Process the folder and save the results in the new folder
-process_folder_and_evaluate(image_folder, output_folder, mask_path)
+
+def extract_number_from_filename(filename):
+    '''Function to extract the number of the image'''
+    match = re.search(r'bbdd_(\d{5})_w2\.pkl', filename)
+    if match:
+        return int(match.group(1))
+
+
+def extract_number_from_filename_qsd1_w1(filename):
+    '''Function to extract the number of the image'''
+    match = re.search(r'(\d{5})_w2\.pkl', filename)
+    if match:
+        return int(match.group(1))
+
 
 def spatial_pyramid_histogram(image, levels=2,resize=True,dimensions=1,hist_size=[8,8], hist_range=[0,256,0,256]):
     """
@@ -131,8 +151,8 @@ def spatial_pyramid_histogram(image, levels=2,resize=True,dimensions=1,hist_size
     """
 
     pyramid_hist = []
-    if resize==True:
-        image = cv2.resize(image, (256, 256), interpolation = cv2.INTER_AREA) 
+    if resize == True:
+        image = cv2.resize(image, (256, 256), interpolation=cv2.INTER_AREA)
     h, w = image.shape[:2]  # Get the height and width of the image
 
     # Loop through each level in the pyramid
@@ -183,11 +203,11 @@ def spatial_pyramid_histogram(image, levels=2,resize=True,dimensions=1,hist_size
 
 def process_directory(directory_path):
     for filename in os.listdir(directory_path):
-        if filename.endswith('.jpg'):
+        if filename.endswith('.png'):
             img_path = os.path.join(directory_path, filename)
             img_BGR = cv2.imread(img_path)
-            
-            #CieLab
+
+            # CieLab
             img_HSV = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
             hist_resize_HSV_64_1D = spatial_pyramid_histogram(img_HSV, levels=2,resize=True, dimensions=1, hist_size=[64], hist_range=[0, 256])
 
@@ -203,6 +223,13 @@ def process_directory(directory_path):
                 pickle.dump(histograms, pkl_file)
 
 
+# Define folder containing the images and the output folder
+image_folder = 'datasets/qst2_w2'
+output_folder = 'image_without_background_test'
+mask_path = 'results/week2/QST2/method1'
+# Process the folder and save the results in the new folder
+process_folder_and_evaluate(image_folder, output_folder, mask_path)
+
 
 # process both folders
 directory_test1 = "image_without_background_test"
@@ -210,20 +237,10 @@ print("Current working directory:", os.getcwd())
 print("Processing directory 1:")
 process_directory(directory_test1)
 
+
 directory = 'image_without_background_test'
 directory_bbdd = 'data/BBDD/week2'
 
-def extract_number_from_filename(filename):
-    '''Function to extract the number of the image'''
-    match = re.search(r'bbdd_(\d{5})_w2\.pkl', filename)
-    if match:
-        return int(match.group(1))
-
-def extract_number_from_filename_qsd1_w1(filename):
-    '''Function to extract the number of the image'''
-    match = re.search(r'(\d{5})_w2\.pkl', filename)
-    if match:
-        return int(match.group(1))
 
 # Method 1
 min_distance = float('inf')

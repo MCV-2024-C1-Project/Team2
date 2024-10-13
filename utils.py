@@ -55,3 +55,16 @@ def find_most_similar_image(query_image, dataset_folder):
                 most_similar_image = filename
 
     return most_similar_image, highest_similarity
+
+
+def our_metric(h1, h2):
+    # Input: h1, h2 (list or numpy array) - Histograms
+    # Calculate the Chi-Square distance between two histograms
+
+    h1 = np.array(h1)
+    h2 = np.array(h2)
+    denominator = h1 + h2
+    denominator = np.where(denominator == 0, 1, denominator)  # to not divide into zero
+    distance = np.sum((np.abs(h1 - h2)) / denominator)
+
+    return distance

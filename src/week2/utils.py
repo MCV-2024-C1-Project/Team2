@@ -94,6 +94,7 @@ def X2_distance(h1, h2):
 
     return similarity
 
+
 def our_metric(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms
     # Calculate the Chi-Square distance between two histograms

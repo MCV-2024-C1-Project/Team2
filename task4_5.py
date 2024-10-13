@@ -4,7 +4,7 @@ import os
 
 
 # Function to create a background model from the edges
-def create_background_model(image, bg_value=20):
+def create_background_model(image, bg_value=60):
     height, width, _ = image.shape
 
     # Get the pixels from the specified number of pixels from the edges
@@ -50,16 +50,16 @@ def evaluate_mask_precision_recall_f1(generated_mask, ground_truth_mask):
 def remove_background(image, mask):
     # Convert the mask to 3 channels to apply it to the original image
     mask_3channel = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-    
+
     # Apply the mask to the image (bitwise_and keeps only the foreground pixels)
     image_without_bg = cv2.bitwise_and(image, mask_3channel)
-    
+
     # Create an alpha channel (transparency mask)
     alpha_channel = np.where(mask == 255, 255, 0).astype(np.uint8)  # Foreground is opaque, background is transparent
-    
+
     # Add the alpha channel to the image
     image_with_alpha = cv2.merge([image_without_bg[:, :, 0], image_without_bg[:, :, 1], image_without_bg[:, :, 2], alpha_channel])
-    
+
     return image_with_alpha
 
 
@@ -82,6 +82,7 @@ def clean_mask(mask, threshold=0.8):
             mask[:, x] = 0
 
     return mask
+
 
 def morphologically_close_mask(mask):
     # Define a kernel for the morphological operations

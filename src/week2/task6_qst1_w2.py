@@ -6,7 +6,7 @@ import numpy as np
 import cv2
 
 
-def spatial_pyramid_histogram(image, levels=2,dimensions=1,hist_size=[8,8], hist_range=[0,256,0,256]):
+def spatial_pyramid_histogram(image, levels=2,resize=True,dimensions=1,hist_size=[8,8], hist_range=[0,256,0,256]):
     """
     Compute a spatial pyramid representation of histograms, with concatenation of histograms per channel.
     Level zero has 1 block. 2^0=1 so blocks 1*1=1
@@ -15,6 +15,9 @@ def spatial_pyramid_histogram(image, levels=2,dimensions=1,hist_size=[8,8], hist
     """
 
     pyramid_hist = []
+    # resize image to 256*256
+    if resize==True:
+        image = cv2.resize(image, (256, 256), interpolation = cv2.INTER_AREA) 
     h, w = image.shape[:2]  # Get the height and width of the image
 
     # Loop through each level in the pyramid
@@ -68,13 +71,13 @@ def process_directory(directory_path):
         if filename.endswith('.jpg'):
             img_path = os.path.join(directory_path, filename)
             img_BGR = cv2.imread(img_path)
-            
-            #CieLab
-            img_LAB = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2LAB)
-            hist_LAB_32_2D = spatial_pyramid_histogram(img_LAB, levels=2, dimensions=2, hist_size=[32,32], hist_range=[0, 256,0, 256])
+
+            # CieLab
+            img_HSV = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
+            hist_resize_HSV_64_1D = spatial_pyramid_histogram(img_HSV, levels=2,resize=True, dimensions=1, hist_size=[64], hist_range=[0, 256])
 
             histograms = {
-                'hist_LAB_32_2D': hist_LAB_32_2D,
+                'hist_resize_HSV_64_1D': hist_resize_HSV_64_1D,
             }
 
             save_path = directory_path
@@ -134,10 +137,10 @@ for file_compare_image in files_sorted:
                 with open(pkl_path, 'rb') as pkl_file:
                     histograms = pickle.load(pkl_file)
 
-                histogram_first_grey = histograms_first['hist_LAB_32_2D']
-                histogram_grey = histograms['hist_LAB_32_2D']
+                histogram_first_grey = histograms_first['hist_resize_HSV_64_1D']
+                histogram_grey = histograms['hist_resize_HSV_64_1D']
                 # # Try all 4 loss functions: euc_dist, L1_dist, X2_distance, hellinger_kernel, histogram_similiarity
-                distance = utils.hellinger_kernel(histogram_first_grey, histogram_grey)
+                distance = utils.our_metric(histogram_first_grey, histogram_grey)
 
                 index = extract_number_from_filename(filename)
 
