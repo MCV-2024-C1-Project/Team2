@@ -1,6 +1,6 @@
 # Team2 
 
-## MCV, C1: Introduction to Human and Computer Vision - week2
+## MCV, C1: Introduction to Human and Computer Vision - week3
 
 ## Project Description
 
