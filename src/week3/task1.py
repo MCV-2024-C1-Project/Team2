@@ -1,8 +1,8 @@
 import os
 import sys
 import cv2
-import pickle
 import numpy as np
+
 
 image_path = 'datasets/qsd1_w3/'
 
@@ -10,6 +10,36 @@ image_path = 'datasets/qsd1_w3/'
 old_stdout = sys.stdout
 log_file = open("task1_output.log", "w", encoding='utf-8')
 sys.stdout = log_file
+
+
+def is_noisy(image):
+
+    channels = cv2.split(image)  # This will give three channels: B, G, R
+
+    laplacian_vars = []
+
+    # Loop over each channel (B, G, R) and compute the Laplacian variance
+    for channel in channels:
+        laplacian = cv2.Laplacian(channel, cv2.CV_64F)
+        laplacian_vars.append(laplacian.var())
+
+    total_var = np.mean(laplacian_vars)
+
+    return total_var > 4000
+
+
+def compute_brightness(image):
+
+    B, G, R = cv2.split(image)
+
+    # Compute the brightness using the weighted sum
+    brightness = 0.299 * R + 0.587 * G + 0.114 * B
+    # brightness = 0.2126 * R + 0.7152 * G + 0.0722 * B
+
+    # Compute the average brightness
+    average_brightness = np.mean(brightness)
+
+    return average_brightness
 
 
 def get_image_index(filename):
@@ -37,12 +67,6 @@ def multiply_hue(image, hue_factor):
     return transformed_image
 
 
-def is_noisy(image, threshold=30):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    std_dev = np.std(gray)
-    return std_dev > threshold
-
-
 def apply_filters(image):
     if is_noisy(image):
         denoised = cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 21)
@@ -63,19 +87,16 @@ def calculate_psnr(original, filtered):
     return psnr
 
 
-file_path = 'datasets/qsd1_w3/augmentations.pkl'
-with open(file_path, 'rb') as file:
-    data = pickle.load(file)
-
-
+hue_threshold = 100
 for filename in os.listdir(image_path):
     if filename.lower().endswith(('.jpg')):
 
         image = cv2.imread(image_path + filename)
+        # img_index = get_image_index(filename)
 
-        img_index = get_image_index(filename)
+        average_brightness = compute_brightness(image)
 
-        if data[img_index] == 'UnnamedImpulseNoise':
+        if is_noisy(image):
 
             best_result = None
             best_psnr = 0
@@ -94,7 +115,8 @@ for filename in os.listdir(image_path):
                         filtered_image, cv2.MORPH_OPEN, kernel)
 
             cv2.imwrite('filtered_img/' + filename, best_result)
-        elif data[img_index] == 'None-MultiplyHue':
+
+        elif average_brightness > hue_threshold:
 
             hue_factor = 1.5
             transformed_image = multiply_hue(image, hue_factor)
