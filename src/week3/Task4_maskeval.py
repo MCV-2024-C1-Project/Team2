@@ -36,42 +36,77 @@ def process_folder_and_evaluate_pkl(pkl_folder):
     # Iterate over all .pkl files in the folder
     for filename in os.listdir(pkl_folder):
         if filename.endswith('_mask_s_contour1.png'):
-            #pkl_path = os.path.join(pkl_folder, filename)
-            corresponding_image_path = os.path.join(pkl_folder, filename.replace('_mask_s_contours.png', '.png'))
-            image_path = os.path.join(pkl_folder, filename)
-            # Load the .pkl file (which contains the masks)
-            #with open(pkl_path, 'rb') as file:
-                #masks = pickle.load(file)
-            masks = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+            contour2_filename = filename.replace('_mask_s_contour1.png', '_mask_s_contour2.png')
 
-            # Choose the mask to evaluate based on the parameter
-            #if mask_type not in masks:
-                #print(f"Error: mask type '{mask_type}' not found in {filename}. Skipping.")
-                #continue
+            if contour2_filename in os.listdir(pkl_folder):
+                # load two masks and join them
+                image_path1 = os.path.join(pkl_folder, filename)
+                image_path2 = os.path.join(pkl_folder, contour2_filename)
+                mask1 = cv2.imread(image_path1, cv2.IMREAD_GRAYSCALE)
+                mask2 = cv2.imread(image_path2, cv2.IMREAD_GRAYSCALE)
+                joined_mask = np.maximum(mask1, mask2)
+                cv2.imshow('image', joined_mask); cv2.waitKey(0); cv2.destroyAllWindows()
 
-            generated_mask = masks    #[mask_type]
+                # Load the corresponding ground truth mask (as .png)
+                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_mask_s_contour1.png', '.png'))
+                ground_truth_mask = cv2.imread(corresponding_image_path, cv2.IMREAD_GRAYSCALE)
+                if ground_truth_mask is None:
+                    print(f"Error loading ground truth for {filename}, skipping.")
+                    continue
 
-            # Load the corresponding ground truth mask (as .png)
-            ground_truth_mask = cv2.imread(corresponding_image_path, cv2.IMREAD_GRAYSCALE)
+                # Evaluate the generated mask against the ground truth mask using precision, recall, and F1-score
+                precision, recall, f1_score = evaluate_mask_precision_recall_f1(joined_mask, ground_truth_mask)
 
-            if ground_truth_mask is None:
-                print(f"Error loading ground truth for {filename}, skipping.")
-                continue
+                # Print evaluation results for the file
+                print(f"Results for {filename}:")
+                print(f"  Precision: {precision:.4f}")
+                print(f"  Recall: {recall:.4f}")
+                print(f"  F1-score: {f1_score:.4f}")
 
-            # Evaluate the generated mask against the ground truth mask using precision, recall, and F1-score
-            precision, recall, f1_score = evaluate_mask_precision_recall_f1(generated_mask, ground_truth_mask)
+                # Accumulate the metrics for overall performance
+                total_precision += precision
+                total_recall += recall
+                total_f1 += f1_score
+                num_files += 1
 
-            # Print evaluation results for the file
-            print(f"Results for {filename}:")
-            print(f"  Precision: {precision:.4f}")
-            print(f"  Recall: {recall:.4f}")
-            print(f"  F1-score: {f1_score:.4f}")
+            else:
+           
+                #pkl_path = os.path.join(pkl_folder, filename)
+                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_mask_s_contour1.png', '.png'))
+                image_path = os.path.join(pkl_folder, filename)
+                # Load the .pkl file (which contains the masks)
+                #with open(pkl_path, 'rb') as file:
+                    #masks = pickle.load(file)
+                masks = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+                cv2.imshow('image', masks); cv2.waitKey(0); cv2.destroyAllWindows()
+                # Choose the mask to evaluate based on the parameter
+                #if mask_type not in masks:
+                    #print(f"Error: mask type '{mask_type}' not found in {filename}. Skipping.")
+                    #continue
 
-            # Accumulate the metrics for overall performance
-            total_precision += precision
-            total_recall += recall
-            total_f1 += f1_score
-            num_files += 1
+                generated_mask = masks    #[mask_type]
+
+                # Load the corresponding ground truth mask (as .png)
+                ground_truth_mask = cv2.imread(corresponding_image_path, cv2.IMREAD_GRAYSCALE)
+
+                if ground_truth_mask is None:
+                    print(f"Error loading ground truth for {filename}, skipping.")
+                    continue
+
+                # Evaluate the generated mask against the ground truth mask using precision, recall, and F1-score
+                precision, recall, f1_score = evaluate_mask_precision_recall_f1(generated_mask, ground_truth_mask)
+
+                # Print evaluation results for the file
+                print(f"Results for {filename}:")
+                print(f"  Precision: {precision:.4f}")
+                print(f"  Recall: {recall:.4f}")
+                print(f"  F1-score: {f1_score:.4f}")
+
+                # Accumulate the metrics for overall performance
+                total_precision += precision
+                total_recall += recall
+                total_f1 += f1_score
+                num_files += 1
 
     # Compute and print the average performance over all files
     if num_files > 0:

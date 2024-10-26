@@ -19,6 +19,9 @@ def contour_mask(mask):
     # Sort rectangles by area in descending order
     rectangles = sorted(rectangles, key=lambda r: r[2] * r[3], reverse=True)
 
+    height, width = mask.shape
+    total_area = height * width
+
     # Find the two largest non-overlapping rectangles
     largest_rectangles = []
     for i, rect1 in enumerate(rectangles):
@@ -89,7 +92,7 @@ for filename in os.listdir(directory):
         base_name = os.path.splitext(filename)[0]
         mask_1_filename = f"{base_name}_contour1.png"
         mask_1_path = os.path.join(directory, mask_1_filename)
-        
+
         # Save the first mask
         if mask_1 is not None:
             cv2.imwrite(mask_1_path, mask_1)
