@@ -190,7 +190,7 @@ image_path = '../../datasets/qst1_w3/'
 #             cv2.imwrite('filtered_test_img/' + filename, image)
 
 # #Process the descriptors
-directory_test = "filtered_test_img"
+directory_test = "filtered_cropped_qst1"
 # print("Processing directory test:")
 # process_directory(directory_test)
 
@@ -247,5 +247,5 @@ list_results_k_10_enteros = [[int(x) for x in sublist] for sublist in list_resul
 print(list_results_k_10_enteros)
 
 # store results k=10
-with open('../../results/week3/QST1/method1/result.pkl', 'wb') as pkl_file:
+with open('../../results/week3/QST2/method1/result.pkl', 'wb') as pkl_file:
     pickle.dump(list_results_k_10_enteros, pkl_file)

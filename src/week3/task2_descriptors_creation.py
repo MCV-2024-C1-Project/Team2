@@ -215,15 +215,15 @@ def process_directory(directory_path,flag=0):
                 pickle.dump(histograms, pkl_file)
 
 
-
 # process both folders
-directory_query1 = "filtered_images"
+directory_query1 = "src/week3/filtered_cropped_qst2_w3"
+# directory_query1 = "filtered_cropped_qst2_w3"
+
 directory_query2 = "../../data/BBDD"
 print("Current working directory:", os.getcwd())
 print("Processing directory 1:")
 
-process_directory(directory_query1,flag=0)
+process_directory(directory_query1, flag=0)
 
-print("Processing directory 2:")
-process_directory(directory_query2,flag=1)
-
+# print("Processing directory 2:")
+# process_directory(directory_query2,flag=1)
