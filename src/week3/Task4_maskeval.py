@@ -27,7 +27,7 @@ def evaluate_mask_precision_recall_f1(generated_mask, ground_truth_mask):
     return precision, recall, f1_score
 
 # Process all .pkl files in the folder and accumulate Precision, Recall, and F1-score
-def process_folder_and_evaluate_pkl(pkl_folder, mask_type='mask'):
+def process_folder_and_evaluate_pkl(pkl_folder):
     total_precision = 0
     total_recall = 0
     total_f1 = 0
@@ -35,7 +35,7 @@ def process_folder_and_evaluate_pkl(pkl_folder, mask_type='mask'):
 
     # Iterate over all .pkl files in the folder
     for filename in os.listdir(pkl_folder):
-        if filename.endswith('_mask_s_contours.png'):
+        if filename.endswith('_mask_s_contour1.png'):
             #pkl_path = os.path.join(pkl_folder, filename)
             corresponding_image_path = os.path.join(pkl_folder, filename.replace('_mask_s_contours.png', '.png'))
             image_path = os.path.join(pkl_folder, filename)

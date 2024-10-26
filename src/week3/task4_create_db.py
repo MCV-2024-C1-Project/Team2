@@ -6,7 +6,7 @@ from skimage.segmentation import clear_border, chan_vese
 from task1 import is_noisy, apply_filters
 
 # Load the image
-directory = 'datasets/qst2_w3/'
+directory = 'datasets/qsd2_w3/'
 
 # Iterate through the directory to process all .jpg files
 for filename in os.listdir(directory):
@@ -19,8 +19,11 @@ for filename in os.listdir(directory):
         img_greyscale = cv2.cvtColor(img_denoised, cv2.COLOR_BGR2GRAY)
         img_hsv = cv2.cvtColor(img_denoised, cv2.COLOR_BGR2HSV)
         img_s = img_hsv[:,:,1]
+        claeh = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        img_s_clahe = claeh.apply(img_s)
+
         # Perform Chan-Vese segmentation
-        cv = chan_vese(img_s, mu=0.08, lambda1=1, lambda2=1, tol=1e-3, max_num_iter=200,
+        cv = chan_vese(img_s_clahe, mu=0.08, lambda1=0.8, lambda2=1.2, tol=1e-3, max_num_iter=300,
                        dt=0.5, init_level_set="checkerboard", extended_output=True)
 
         # Convert the result to uint8 to display it
