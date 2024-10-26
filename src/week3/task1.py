@@ -63,7 +63,7 @@ def calculate_psnr(original, filtered):
     return psnr
 
 
-file_path = 'datasets/qsd1_w3/augmentations.pkl'
+file_path = 'datasets/qsd2_w3/augmentations.pkl'
 with open(file_path, 'rb') as file:
     data = pickle.load(file)
 
@@ -93,16 +93,16 @@ for filename in os.listdir(image_path):
                     best_result = cv2.morphologyEx(
                         filtered_image, cv2.MORPH_OPEN, kernel)
 
-            cv2.imwrite('filtered_img/' + filename, best_result)
+            cv2.imwrite('src/week3/filtered_img_qsd2_w3/' + filename, best_result)
         elif data[img_index] == 'None-MultiplyHue':
 
             hue_factor = 1.5
             transformed_image = multiply_hue(image, hue_factor)
 
-            cv2.imwrite('filtered_img/' + filename, transformed_image)
+            cv2.imwrite('src/week3/filtered_img_qsd2_w3/' + filename, transformed_image)
 
         else:
-            cv2.imwrite('filtered_img/' + filename, image)
+            cv2.imwrite('src/week3/filtered_img_qsd2_w3/' + filename, image)
 
 sys.stdout = old_stdout
 log_file.close()
