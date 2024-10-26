@@ -4,7 +4,7 @@ import pickle
 import cv2
 from skimage.feature import local_binary_pattern
 from scipy.fftpack import dct
-
+import pywt
 
 def lbp_descriptor_by_block_size(image, num_points=8, radius=1, block_size=8):
     fixed_size = (256, 256)
@@ -38,122 +38,75 @@ def lbp_descriptor_by_block_size(image, num_points=8, radius=1, block_size=8):
 
     # Concatenate all block histograms into a single feature vector
     feature_vector = np.concatenate(lbp_blocks)
-    return feature_vector  
+    return feature_vector 
+ 
+def wavelet_descriptor_by_block_size(image, wavelet='haar', block_size=8):
+    fixed_size = (256, 256)
+    resized_image = cv2.resize(image, fixed_size)
+    h, w = resized_image.shape[:2]
+    wavelet_blocks = []
 
+    # Loop over the blocks defined by block_size
+    for i in range(0, h, block_size):
+        for j in range(0, w, block_size):
+            # Define the block region
+            block = resized_image[i:i + block_size, j:j + block_size]
+            if block.shape[0] == block_size and block.shape[1] == block_size:
+                if len(image.shape) == 2:  # Grayscale image
+                    # Apply DWT to the block
+                    cA, (cH, cV, cD) = pywt.dwt2(block, wavelet)
+                    # Concatenate the coefficients of the subbands into a single vector
+                    wavelet_descriptor = np.concatenate([cA.ravel(), cH.ravel(), cV.ravel(), cD.ravel()])
+                    wavelet_blocks.append(wavelet_descriptor)
+                else:  # Color image (RGB)
+                    for channel in range(3):
+                        # Apply DWT to each channel of the block
+                        cA, (cH, cV, cD) = pywt.dwt2(block[:, :, channel], wavelet)
+                        # Concatenate the coefficients of the subbands
+                        wavelet_descriptor = np.concatenate([cA.ravel(), cH.ravel(), cV.ravel(), cD.ravel()])
+                        wavelet_blocks.append(wavelet_descriptor)
 
-# def bilinear_interpolation(img, x, y):
-#     h, w = img.shape
-    
-#     # Calcular los índices de los píxeles vecinos
-#     x1, y1 = int(x), int(y)
-    
-#     # Verificar los límites de los índices
-#     x2 = x1 + 1 if x1 + 1 < w else x1  # Si está en el borde, usar el mismo índice
-#     y2 = y1 + 1 if y1 + 1 < h else y1  # Si está en el borde, usar el mismo índice
+    # Concatenate all block descriptors into a single feature vector
+    feature_vector = np.concatenate(wavelet_blocks)
+    return feature_vector
 
-#     # Distancias fraccionales
-#     dx, dy = x - x1, y - y1
+def multiscale_lbp_descriptor_color(image, radius_values, num_points=8, block_size=8):
+    fixed_size = (256, 256)
+    resized_image = cv2.resize(image, fixed_size)
+    h, w, _ = resized_image.shape
+    lbp_descriptors = []
 
-#     # Interpolación bilineal
-#     R1 = (1 - dx) * img[y1, x1] + dx * img[y1, x2]
-#     R2 = (1 - dx) * img[y2, x1] + dx * img[y2, x2]
-#     P = (1 - dy) * R1 + dy * R2
+    # Split the resized image into color channels
+    channels = cv2.split(resized_image)
 
-#     return P
-
-# def multiscale_lbp_descriptor_color_2(image, radius_range=[1, 2, 3], num_points=8, block_size=8):
-#     fixed_size = (256, 256)
-#     resized_image = cv2.resize(image, fixed_size)
-#     h, w = resized_image.shape[:2]
-#     lbp_blocks = []
-
-#     for channel in range(3):
-#         channel_image = image[:, :, channel]  # Extraer canal
-#         channel_blocks = []
+    # For each color channel (R, G, B)
+    for channel in channels:
+        channel_descriptors = []
         
-#         # Dividir la imagen en bloques
-#         for i in range(0, h, block_size):
-#             for j in range(0, w, block_size):
-#                 block = channel_image[i:i + block_size, j:j + block_size]
-#                 if block.shape == (block_size, block_size):
-#                     block_hist = []
-#                     # Calcular LBP en múltiples escalas
-#                     for radius in radius_range:
-#                         lbp = np.zeros_like(block)
-#                         for y in range(block.shape[0]):
-#                             for x in range(block.shape[1]):
-#                                 center = block[y, x]
-#                                 for p in range(num_points):
-#                                     theta = 2 * np.pi * p / num_points
-#                                     neighbor_x = x + radius * np.cos(theta)
-#                                     neighbor_y = y - radius * np.sin(theta)
-
-#                                     # Interpolación bilineal para obtener el valor del vecino
-#                                     neighbor_value = bilinear_interpolation(block, neighbor_x, neighbor_y)
-
-#                                     # Comparar vecino con el valor del píxel central
-#                                     lbp[y, x] += (neighbor_value > center) << p
-
-#                         lbp_uint8 = np.uint8(lbp)
-#                         hist, _ = np.histogram(lbp_uint8.ravel(), bins=np.arange(0, num_points + 3), range=(0, num_points + 2))
-#                         hist = hist / np.sum(hist)  # Normalizar histograma
-#                         block_hist.append(hist)
-                    
-#                     # Concatenar los histogramas de distintas escalas
-#                     channel_blocks.append(np.concatenate(block_hist))
-        
-#         # Concatenar los histogramas de todos los bloques para este canal
-#         lbp_blocks.append(np.concatenate(channel_blocks))
-
-#     # Concatenar los descriptores de los 3 canales
-#     feature_vector = np.concatenate(lbp_blocks)
-#     return feature_vector
-
-# def multiscale_lbp_descriptor_color(image, radius_values, num_points=8, block_size=8):
-#     h, w, _ = image.shape
-#     lbp_descriptors = []
-
-#     # Separar los canales de la imagen
-#     channels = cv2.split(image)
-
-#     # Para cada canal de color (R, G, B)
-#     for channel in channels:
-#         channel_descriptors = []
-        
-#         # Dividir la imagen en bloques
-#         for i in range(0, h, block_size):
-#             for j in range(0, w, block_size):
-#                 block = channel[i:i + block_size, j:j + block_size]
+        # Divide the image into blocks
+        for i in range(0, h, block_size):
+            for j in range(0, w, block_size):
+                block = channel[i:i + block_size, j:j + block_size]
+                block_descriptors = []
                 
-#                 # Si el bloque no es de tamaño completo, lo rellenamos con ceros
-#                 if block.shape != (block_size, block_size):
-#                     padded_block = np.zeros((block_size, block_size), dtype=block.dtype)
-#                     padded_block[:block.shape[0], :block.shape[1]] = block
-#                     block = padded_block
+                # Calculate LBP at multiple scales for the block
+                for radius in radius_values:
+                    # Apply LBP
+                    lbp = local_binary_pattern(block, num_points, radius, method="uniform")
+                    lbp_uint8 = np.uint8(lbp)
+                    hist, _ = np.histogram(lbp_uint8.ravel(), bins=np.arange(0, num_points + 3), range=(0, num_points + 2))
+                    hist = hist / np.sum(hist)  
+                    block_descriptors.append(hist)
                 
-#                 # Calcular LBP en múltiples escalas
-#                 for radius in radius_values:
-#                     # Redimensionar bloque con interpolación bilineal
-#                     scale_factor = radius / min(radius_values)
-#                     scaled_block = cv2.resize(block, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_LINEAR)
-                    
-#                     # Aplicar LBP
-#                     lbp = local_binary_pattern(scaled_block, num_points, radius, method="uniform")
-#                     lbp_uint8 = np.uint8(lbp)
-                    
-#                     # Obtener histograma del LBP
-#                     hist, _ = np.histogram(lbp_uint8.ravel(), bins=np.arange(0, num_points + 3), range=(0, num_points + 2))
-#                     hist = hist / np.sum(hist)  # Normalizar el histograma
-                    
-#                     # Agregar histograma al descriptor del bloque
-#                     channel_descriptors.append(hist)
+                # Concatenate descriptors for each scale in the block
+                channel_descriptors.append(np.concatenate(block_descriptors))
         
-#         # Concatenar los descriptores LBP para este canal
-#         lbp_descriptors.append(np.concatenate(channel_descriptors))
+        # Concatenate LBP descriptors for this channel
+        lbp_descriptors.append(np.concatenate(channel_descriptors))
     
-#     # Concatenar los descriptores de los tres canales
-#     feature_vector = np.concatenate(lbp_descriptors)
-#     return feature_vector
+    # Concatenate descriptors from all three channels into a single feature vector
+    feature_vector = np.concatenate(lbp_descriptors)
+    return feature_vector
 
 
 def zigzag_scan(matrix):
@@ -202,58 +155,53 @@ def process_directory(directory_path,flag=0):
             img_BGR = cv2.imread(img_path)
             img_ycbcr = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2YCrCb)
             #LBP for ycbcr
-            hist_LBP_ycbcr_n8_1D=lbp_descriptor_by_block_size(img_ycbcr,num_points=8,radius=1,block_size=8)
+            #hist_LBP_ycbcr_n8_1D=lbp_descriptor_by_block_size(img_ycbcr,num_points=8,radius=1,block_size=8)
             hist_LBP_ycbcr_n8_r2_1D=lbp_descriptor_by_block_size(img_ycbcr,num_points=8,radius=2,block_size=8)
-            #hist_LBPM_ycbcr_n8_1D_2=multiscale_lbp_descriptor_color_2(img_ycbcr,radius_range=[1,2.5,4],num_points=8,block_size=8)
-            #hist_LBPM_ycbcr_n8_1D=multiscale_lbp_descriptor_color(img_ycbcr,radius_values=[1,1.5,3],num_points=8,block_size=8)
+            hist_LBPM_ycbcr_n8_1D=multiscale_lbp_descriptor_color(img_ycbcr,radius_values=[1,2,3],num_points=8,block_size=8)
+            #hist_W_ycbcr_n8=wavelet_descriptor_by_block_size(img_ycbcr,wavelet='haar',block_size=8)
             #DCT for ycbcr
-            hist_DCT_ycbcr_n8_c10_1D=dct_descriptor_color(img_ycbcr, block_size=8, num_coefs=10)
+            #hist_DCT_ycbcr_n8_c10_1D=dct_descriptor_color(img_ycbcr, block_size=8, num_coefs=10)
             hist_DCT_ycbcr_n32_c10_1D=dct_descriptor_color(img_ycbcr, block_size=32, num_coefs=10)
 
             # Extract descriptors from CieLab
             img_LAB = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2LAB)
             #LBP for CieLab
-            hist_LBP_LAB_n8_1D=lbp_descriptor_by_block_size(img_LAB,num_points=8,radius=1,block_size=8)
+            #hist_LBP_LAB_n8_1D=lbp_descriptor_by_block_size(img_LAB,num_points=8,radius=1,block_size=8)
             hist_LBP_LAB_n8_r2_1D=lbp_descriptor_by_block_size(img_LAB,num_points=8,radius=2,block_size=8)
-            #hist_LBPM_LAB_n8_1D_2=multiscale_lbp_descriptor_color_2(img_LAB,radius_range=[1,2.5,4],num_points=8,block_size=8)
-            #hist_LBPM_LAB_n8_1D=multiscale_lbp_descriptor_color(img_LAB,radius_values=[1,1.5,3],num_points=8,block_size=8)
+            hist_LBPM_LAB_n8_1D=multiscale_lbp_descriptor_color(img_LAB,radius_values=[1,2,3],num_points=8,block_size=8)
+            #hist_W_LAB_n8=wavelet_descriptor_by_block_size(img_LAB,wavelet='haar',block_size=8)
             #DCT for CieLab
-            hist_DCT_LAB_n8_c10_1D=dct_descriptor_color(img_LAB, block_size=8, num_coefs=10)
+            # hist_DCT_LAB_n8_c10_1D=dct_descriptor_color(img_LAB, block_size=8, num_coefs=10)
             hist_DCT_LAB_n32_c10_1D=dct_descriptor_color(img_LAB, block_size=32, num_coefs=10)
 
             # Extract descriptors for HSV
             img_HSV = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2HSV)
             #LBP for HSV
-            hist_LBP_HSV_n8_1D=lbp_descriptor_by_block_size(img_HSV,num_points=8,radius=1,block_size=8)
+            #hist_LBP_HSV_n8_1D=lbp_descriptor_by_block_size(img_HSV,num_points=8,radius=1,block_size=8)
             hist_LBP_HSV_n8_r2_1D=lbp_descriptor_by_block_size(img_HSV,num_points=8,radius=2,block_size=8)
-            #hist_LBPM_HSV_n8_1D_2=multiscale_lbp_descriptor_color_2(img_HSV,radius_range=[1,2.5,4],num_points=8,block_size=8)
+            hist_LBPM_HSV_n8_1D=multiscale_lbp_descriptor_color(img_HSV,radius_values=[1,2,3],num_points=8,block_size=8)
             #hist_LBPM_HSV_n8_1D=multiscale_lbp_descriptor_color(img_HSV,radius_values=[1,1.5,3],num_points=8,block_size=8)
             #DCT for HSV
-            hist_DCT_HSV_n8_c10_1D=dct_descriptor_color(img_HSV, block_size=8, num_coefs=10)
+            # hist_DCT_HSV_n8_c10_1D=dct_descriptor_color(img_HSV, block_size=8, num_coefs=10)
             hist_DCT_HSV_n32_c10_1D=dct_descriptor_color(img_HSV, block_size=32, num_coefs=10)
 
             #combine
-            hist_LBP_HSV_LAB_ycbcr_n8_r1_1D = np.concatenate((hist_LBP_HSV_n8_1D, hist_LBP_LAB_n8_1D,hist_LBP_ycbcr_n8_1D))
+            # hist_LBP_HSV_LAB_ycbcr_n8_r1_1D = np.concatenate((hist_LBP_HSV_n8_1D, hist_LBP_LAB_n8_1D,hist_LBP_ycbcr_n8_1D))
             hist_LBP_HSV_LAB_ycbcr_n8_r2_1D = np.concatenate((hist_LBP_HSV_n8_r2_1D, hist_LBP_LAB_n8_r2_1D,hist_LBP_ycbcr_n8_r2_1D))
-            hist_DCT_HSV_LAB_ycbcr_n8_c10_1D=np.concatenate((hist_DCT_HSV_n8_c10_1D,hist_DCT_LAB_n8_c10_1D,hist_DCT_ycbcr_n8_c10_1D))
+            # hist_DCT_HSV_LAB_ycbcr_n8_c10_1D=np.concatenate((hist_DCT_HSV_n8_c10_1D,hist_DCT_LAB_n8_c10_1D,hist_DCT_ycbcr_n8_c10_1D))
             hist_DCT_HSV_LAB_ycbcr_n32_c10_1D=np.concatenate((hist_DCT_HSV_n32_c10_1D,hist_DCT_LAB_n32_c10_1D,hist_DCT_ycbcr_n32_c10_1D))    
 
             histograms = {
-                'hist_LBP_ycbcr_n8_1D':hist_LBP_ycbcr_n8_1D,
                 'hist_LBP_ycbcr_n8_r2_1D':hist_LBP_ycbcr_n8_r2_1D,
-                'hist_DCT_ycbcr_n8_c10_1D':hist_DCT_ycbcr_n8_c10_1D,
+                'hist_LBPM_ycbcr_n8_1D':hist_LBPM_ycbcr_n8_1D,
                 'hist_DCT_ycbcr_n32_c10_1D':hist_DCT_ycbcr_n32_c10_1D,
-                'hist_LBP_LAB_n8_1D':hist_LBP_LAB_n8_1D,
                 'hist_LBP_LAB_n8_r2_1D':hist_LBP_LAB_n8_r2_1D,
-                'hist_DCT_LAB_n8_c10_1D':hist_DCT_LAB_n8_c10_1D,
+                'hist_LBPM_LAB_n8_1D':hist_LBPM_LAB_n8_1D,
                 'hist_DCT_LAB_n32_c10_1D':hist_DCT_LAB_n32_c10_1D,
-                'hist_LBP_HSV_n8_1D':hist_LBP_HSV_n8_1D,
                 'hist_LBP_HSV_n8_r2_1D':hist_LBP_HSV_n8_r2_1D,
-                'hist_DCT_HSV_n8_c10_1D':hist_DCT_HSV_n8_c10_1D,
+                'hist_LBPM_HSV_n8_1D':hist_LBPM_HSV_n8_1D,
                 'hist_DCT_HSV_n32_c10_1D':hist_DCT_HSV_n32_c10_1D,
-                'hist_LBP_HSV_LAB_ycbcr_n8_r1_1D':hist_LBP_HSV_LAB_ycbcr_n8_r1_1D,
                 'hist_LBP_HSV_LAB_ycbcr_n8_r2_1D':hist_LBP_HSV_LAB_ycbcr_n8_r2_1D,
-                'hist_DCT_HSV_LAB_ycbcr_n8_c10_1D':hist_DCT_HSV_LAB_ycbcr_n8_c10_1D,
                 'hist_DCT_HSV_LAB_ycbcr_n32_c10_1D':hist_DCT_HSV_LAB_ycbcr_n32_c10_1D
             }
             if flag==1:
