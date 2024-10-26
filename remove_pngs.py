@@ -18,5 +18,5 @@ def remove_files_with_extension(folder_path, extension):
 
 # Usage
 folder_path = 'datasets/qsd2_w3'
-extension = '_mask_s_fmask.png'  # Specify the extension to match
+extension = 'mask.png'  # Specify the extension to match
 remove_files_with_extension(folder_path, extension)

@@ -6,17 +6,14 @@ import os
 directory = 'datasets/qsd2_w3'
 
 # define function for enhancing the mask
-def contour_mask(mask):
+import cv2
+import numpy as np
 
-    # Apply Canny edge detection
-    #edges = cv2.Canny(mask, threshold1=25, threshold2=50)
-    # Dilate edges to close gaps
-    #edges_dilated = cv2.dilate(edges, None, iterations=1)
-    # Invert the image to make the foreground white
-    #mask = cv2.bitwise_not(edges_dilated)
-    #cv2.imshow('edges', mask); cv2.waitKey(0); cv2.destroyAllWindows()
-    # Find contours in the edge-detected image
+# Define function for enhancing the mask
+def contour_mask(mask):
+    # Find contours in the input mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
     # Get bounding rectangles for all contours
     rectangles = [cv2.boundingRect(contour) for contour in contours]
     # Sort rectangles by area in descending order
@@ -52,17 +49,25 @@ def contour_mask(mask):
         # If the second-largest rectangle is significantly smaller than the largest one, keep only the largest
         if area2 < 0.2 * area1:  # Adjust the threshold (0.2) as needed
             largest_rectangles = [largest_rectangles[0]]
-    # Create a blank mask to draw the rectangles
-    contour_mask = np.zeros_like(mask)
 
-    # Draw the rectangles on the mask
-    for rect in largest_rectangles:
+    # Create individual masks for each rectangle
+    contour_masks = []
+    for idx, rect in enumerate(largest_rectangles):
         x, y, w, h = rect
-        cv2.rectangle(contour_mask, (x, y), (x + w, y + h), 255, thickness=cv2.FILLED)
+        # Create a blank mask for each rectangle
+        individual_mask = np.zeros_like(mask)
+        # Draw the rectangle on the individual mask
+        cv2.rectangle(individual_mask, (x, y), (x + w, y + h), 255, thickness=cv2.FILLED)
+        contour_masks.append(individual_mask)
 
-     # show result
-    #cv2.imshow('edges', contour_mask); cv2.waitKey(0); cv2.destroyAllWindows()
-    return mask, contour_mask
+    # Assign contour masks to return variables
+    if len(contour_masks) == 2:
+        return contour_masks[0], contour_masks[1]
+    elif len(contour_masks) == 1:
+        return contour_masks[0], None
+    else:
+        return None, None
+
    
 #img = cv2.imread('datasets/qsd2_w3/00000_mask_s.png', cv2.IMREAD_GRAYSCALE)
 
@@ -77,21 +82,27 @@ for filename in os.listdir(directory):
         img = cv2.imread(img_path)
         img_greyscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        mask, contour = contour_mask(img_greyscale)
-         # Save both masks as PNG files
-        mask_final_filename = os.path.splitext(filename)[0] + '_fmask.png'
-        mask_contours_filename = os.path.splitext(filename)[0] + '_contours.png'
-
-        mask_final_path = os.path.join(directory, mask_final_filename)
-        mask_contours_path = os.path.join(directory, mask_contours_filename)
-
-        # Save the mask images
-        cv2.imwrite(mask_final_path, mask)
-        cv2.imwrite(mask_contours_path, contour)
-
-        print(f"Saved {mask_final_filename} and {mask_contours_filename}.")
+        # Get contour masks using the modified function
+        mask_1, mask_2 = contour_mask(img_greyscale)
+        
+        # Generate filenames for the contour masks
+        base_name = os.path.splitext(filename)[0]
+        mask_1_filename = f"{base_name}_contour1.png"
+        mask_1_path = os.path.join(directory, mask_1_filename)
+        
+        # Save the first mask
+        if mask_1 is not None:
+            cv2.imwrite(mask_1_path, mask_1)
+            print(f"Saved {mask_1_filename}.")
+        
+        # Save the second mask if it exists
+        if mask_2 is not None:
+            mask_2_filename = f"{base_name}_contour2.png"
+            mask_2_path = os.path.join(directory, mask_2_filename)
+            cv2.imwrite(mask_2_path, mask_2)
+            print(f"Saved {mask_2_filename}.")
             
-print('Finish the data folder proccessing')
+print('Finished processing the data folder')
 
 
 

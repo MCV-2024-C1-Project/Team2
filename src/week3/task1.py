@@ -87,15 +87,7 @@ def calculate_psnr(original, filtered):
     return psnr
 
 
-<<<<<<< HEAD
-file_path = 'datasets/qsd2_w3/augmentations.pkl'
-with open(file_path, 'rb') as file:
-    data = pickle.load(file)
-
-
-=======
 hue_threshold = 100
->>>>>>> afca7be3a4887c16bffbe5e5107158c475ccaaa0
 for filename in os.listdir(image_path):
     if filename.lower().endswith(('.jpg')):
 
@@ -122,14 +114,9 @@ for filename in os.listdir(image_path):
                     best_result = cv2.morphologyEx(
                         filtered_image, cv2.MORPH_OPEN, kernel)
 
-<<<<<<< HEAD
-            cv2.imwrite('src/week3/filtered_img_qsd2_w3/' + filename, best_result)
-        elif data[img_index] == 'None-MultiplyHue':
-=======
             cv2.imwrite('filtered_img/' + filename, best_result)
 
         elif average_brightness > hue_threshold:
->>>>>>> afca7be3a4887c16bffbe5e5107158c475ccaaa0
 
             hue_factor = 1.5
             transformed_image = multiply_hue(image, hue_factor)
