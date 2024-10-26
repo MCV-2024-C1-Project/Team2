@@ -79,27 +79,6 @@ def L1_dist(h1, h2):
     # Calcula la distancia Manhattan (L1) entre dos histogramas usando scipy
     return distance.cityblock(h1, h2)
 
-# def X2_distance(h1, h2):
-#     # Calcula la distancia Chi-Cuadrado entre dos histogramas usando scipy
-#     return distance.chisquare(h1, h2).statistic
-
-# def X2_distance(descriptor1, descriptor2):
-#     # Asegúrate de que ambos descriptores sean arrays de numpy
-#     descriptor1 = np.array(descriptor1)
-#     descriptor2 = np.array(descriptor2)
-
-#     # Evitar dividir por cero en el caso de que los descriptores sumen cero
-#     total = descriptor1 + descriptor2
-#     total = np.where(total == 0, 1, total)  # Para evitar divisiones por cero
-
-#     # Calcula la estadística Chi-Cuadrado usando la función de scipy
-#     # Los valores esperados se pueden calcular como la media de los descriptores
-#     expected = total / 2
-
-#     # Usa chisquare para calcular la distancia Chi-Cuadrado
-#     statistic, _ = chisquare(f_obs=descriptor1, f_exp=expected)
-    
-#     return statistic
 def X2_distance(h1, h2):
     # Input: h1, h2 (list or numpy array) - Histograms
     # Calculate the Chi-Square distance between two histograms

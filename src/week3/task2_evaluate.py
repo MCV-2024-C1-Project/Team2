@@ -21,22 +21,10 @@ def extract_number_from_filename_qsd1_w1(filename):
 
 # Define the histogram keys and distance functions
 histogram_keys = [
-                'hist_LBP_ycbcr_n8_1D',
-                'hist_LBP_ycbcr_n8_r2_1D',
-                'hist_DCT_ycbcr_n8_c10_1D',
-                'hist_DCT_ycbcr_n32_c10_1D',
-                'hist_LBP_LAB_n8_1D',
-                'hist_LBP_LAB_n8_r2_1D',
-                'hist_DCT_LAB_n8_c10_1D',
-                'hist_DCT_LAB_n32_c10_1D',
-                'hist_LBP_HSV_n8_1D',
-                'hist_LBP_HSV_n8_r2_1D',
-                'hist_DCT_HSV_n8_c10_1D',
-                'hist_DCT_HSV_n32_c10_1D',
-                'hist_LBP_HSV_LAB_ycbcr_n8_r1_1D',
-                'hist_LBP_HSV_LAB_ycbcr_n8_r2_1D',
-                'hist_DCT_HSV_LAB_ycbcr_n8_c10_1D',
-                'hist_DCT_HSV_LAB_ycbcr_n32_c10_1D'
+                'hist_LBP_ycbcr_n8_r2_1D','hist_LBPM_ycbcr_n8_1D','hist_DCT_ycbcr_n32_c10_1D',
+                'hist_LBP_LAB_n8_r2_1D','hist_LBPM_LAB_n8_1D','hist_DCT_LAB_n32_c10_1D',
+                'hist_LBP_HSV_n8_r2_1D','hist_LBPM_HSV_n8_1D','hist_DCT_HSV_n32_c10_1D',
+                'hist_LBP_HSV_LAB_ycbcr_n8_r2_1D','hist_DCT_HSV_LAB_ycbcr_n32_c10_1D'
 ]
 
 # Dictionary of distance functions
