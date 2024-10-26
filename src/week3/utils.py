@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import os
+from scipy.spatial import distance
+from scipy.stats import chisquare
 
 
 def calculate_histogram(image):
@@ -68,3 +70,133 @@ def our_metric(h1, h2):
     distance = np.sum((np.abs(h1 - h2)) / denominator)
 
     return distance
+
+def euc_dist(h1, h2):
+    # Calcula la distancia euclidiana entre dos histogramas usando scipy
+    return distance.euclidean(h1, h2)
+
+def L1_dist(h1, h2):
+    # Calcula la distancia Manhattan (L1) entre dos histogramas usando scipy
+    return distance.cityblock(h1, h2)
+
+# def X2_distance(h1, h2):
+#     # Calcula la distancia Chi-Cuadrado entre dos histogramas usando scipy
+#     return distance.chisquare(h1, h2).statistic
+
+# def X2_distance(descriptor1, descriptor2):
+#     # Asegúrate de que ambos descriptores sean arrays de numpy
+#     descriptor1 = np.array(descriptor1)
+#     descriptor2 = np.array(descriptor2)
+
+#     # Evitar dividir por cero en el caso de que los descriptores sumen cero
+#     total = descriptor1 + descriptor2
+#     total = np.where(total == 0, 1, total)  # Para evitar divisiones por cero
+
+#     # Calcula la estadística Chi-Cuadrado usando la función de scipy
+#     # Los valores esperados se pueden calcular como la media de los descriptores
+#     expected = total / 2
+
+#     # Usa chisquare para calcular la distancia Chi-Cuadrado
+#     statistic, _ = chisquare(f_obs=descriptor1, f_exp=expected)
+    
+#     return statistic
+def X2_distance(h1, h2):
+    # Input: h1, h2 (list or numpy array) - Histograms
+    # Calculate the Chi-Square distance between two histograms
+    h1 = h1.astype(np.float32)
+    h2 = h2.astype(np.float32)
+    similarity = cv2.compareHist(h1, h2, cv2.HISTCMP_CHISQR_ALT)
+
+    return similarity
+
+def histogram_similiarity(h1, h2):
+    # Input: h1, h2 (list or numpy array) - Histogram
+    # Calculate the similarity between two histograms using the intersection method
+    similarity = cv2.compareHist(h1, h2, cv2.HISTCMP_INTERSECT)
+
+    return similarity
+
+
+def hellinger_kernel(h1, h2):
+    # Input: h1, h2 (list or numpy array) - Histogram
+    # Calculate the Hellinger kernel similarity between two histograms
+    h1 = h1.astype(np.float32)
+    h2 = h2.astype(np.float32)
+    similarity = cv2.compareHist(h1, h2, cv2.HISTCMP_BHATTACHARYYA)
+
+    return similarity
+
+def load_and_print_pkl(pkl_file_path):
+    # Input: pkl_file_path (string) - Path to the .pkl file
+    # Load and print the contents of a pickle (.pkl) file
+    with open(pkl_file_path, 'rb') as pkl_file:
+        data = pickle.load(pkl_file)      
+        print("Content of the pickle file:")
+        print(data)
+
+
+def apk(actual, predicted, k=10):
+    """
+    Computes the average precision at k.
+    Source: https://github.com/benhamner/Metrics/blob/master/Python/ml_metrics/average_precision.py
+    This function computes the average prescision at k between two lists of
+    items.
+
+    Parameters
+    ----------
+    actual : list
+             A list of elements that are to be predicted (order doesn't matter)
+    predicted : list
+                A list of predicted elements (order does matter)
+    k : int, optional
+        The maximum number of predicted elements
+
+    Returns
+    -------
+    score : double
+            The average precision at k over the input lists
+
+    """
+    if len(predicted) > k:
+        predicted = predicted[:k]
+
+    score = 0.0
+    num_hits = 0.0
+
+    for i, p in enumerate(predicted):
+        if p in actual and p not in predicted[:i]:
+            num_hits += 1.0
+            score += num_hits / (i+1.0)
+
+    if not actual:
+        return 0.0
+
+    return score / min(len(actual), k)
+
+
+def mapk(actual, predicted, k=10):
+    """
+    Source: https://github.com/benhamner/Metrics/blob/master/Python/ml_metrics/average_precision.py
+    Computes the mean average precision at k.
+
+    This function computes the mean average prescision at k between two lists
+    of lists of items.
+
+    Parameters
+    ----------
+    actual : list
+             A list of lists of elements that are to be predicted 
+             (order doesn't matter in the lists)
+    predicted : list
+                A list of lists of predicted elements
+                (order matters in the lists)
+    k : int, optional
+        The maximum number of predicted elements
+
+    Returns
+    -------
+    score : double
+            The mean average precision at k over the input lists
+
+    """
+    return np.mean([apk(a, p, k) for a, p in zip(actual, predicted)])
