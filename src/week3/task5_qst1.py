@@ -237,11 +237,7 @@ if __name__ == "__main__":
             list_results_k_10.append(top_k_10_results)
 
     list_results_k_10 = [result for result in list_results_k_10]
-
-    # Para los resultados aplanados
     predicted_flattened_k_10 = [p for p in list_results_k_10]
-
-    # To ensure that they are integers
     list_results_k_10_enteros = [[int(x) for x in sublist] for sublist in list_results_k_10]
 
     print(list_results_k_10_enteros)
