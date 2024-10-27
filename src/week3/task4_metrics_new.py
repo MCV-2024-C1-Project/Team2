@@ -50,14 +50,33 @@ def custom_mapk(actual, predicted, k=10):
         k: The maximum number of predicted elements to consider.
         """
         # Ensure that predicted is a list of two lists
-        if not isinstance(predicted[0], list):
-            return 0.0
+        if isinstance(predicted[0], list):
 
-        if len(predicted[0]) > k:
-            predicted = [pred[:k] for pred in predicted]
+            if len(predicted[0]) > k:
+                predicted = [pred[:k] for pred in predicted]
 
-        # Check if each ground truth value appears in its corresponding predicted list
-        return 1.0 if actual[0] in predicted[0] and actual[1] in predicted[1] else 0.0
+            # Check if each ground truth value appears in its corresponding predicted list
+            if actual[0] in predicted[0] and actual[1] in predicted[1]:
+                return_value = 1.0
+            elif actual[0] in predicted[0] or actual[1] in predicted[1]:
+                return_value = 0.5
+            else:
+                return_value = 0.0
+
+            return return_value
+
+        else:
+
+            # Check if each ground truth value appears in its corresponding predicted list
+            if actual[0] == predicted[0] and actual[1] == predicted[1]:
+                return_value = 1.0
+            elif actual[0] == predicted[0] or actual[1] == predicted[1]:
+                return_value = 0.5
+            else:
+                return_value = 0.0
+
+            return return_value
+
 
     # Calculate mean of average precision at k for all queries
     scores = []
