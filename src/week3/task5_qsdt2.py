@@ -242,8 +242,8 @@ for image_number, file_list in grouped_files.items():
                     histograms = pickle.load(pkl_file)
 
                 # Extract the histograms for comparison
-                histogram_first_grey = histograms_first['hist_LBP_LAB_n8_r2_1D']
-                histogram_grey = histograms['hist_LBP_LAB_n8_r2_1D']
+                histogram_first_grey = histograms_first['hist_DCT_HSV_n32_c10_1D']
+                histogram_grey = histograms['hist_DCT_HSV_n32_c10_1D']
 
                 # Calculate the distance (using L1 distance as an example)
                 distance = utils.L1_dist(histogram_first_grey, histogram_grey)
@@ -266,7 +266,20 @@ for image_number, file_list in grouped_files.items():
 # Ensure results are integers
 list_results_k_10_enteros = [[[int(x) for x in sublist] for sublist in image_result] for image_result in list_results_k_10]
 
+# list_results_k_10_adjusted = []
+# for image_result in list_results_k_10:
+#     if len(image_result) == 1:
+#        # Single painting case: keep as list of lists
+#        list_results_k_10_adjusted.append([int(x) for x in image_result[0]])
+#    elif len(image_result) == 2:
+#        # Two paintings case: keep as list of lists of lists
+#        list_results_k_10_adjusted.append([[int(x) for x in image_result[0]], [int(x) for x in image_result[1]]])
+
+
 # Print the results
+for i in range(30):
+    print(i, list_results_k_10_enteros[i])
+
 print(list_results_k_10_enteros)
 
 # Store results for k=10

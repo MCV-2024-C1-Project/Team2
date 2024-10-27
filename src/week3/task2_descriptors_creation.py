@@ -216,7 +216,7 @@ def process_directory(directory_path,flag=0):
 
 
 # process both folders
-directory_query1 = "filtered_cropped_qsd2_w3"
+directory_query1 = "filtered_cropped_qst2_w3"
 # directory_query1 = "filtered_cropped_qst2_w3"
 
 directory_query2 = "../../data/BBDD"

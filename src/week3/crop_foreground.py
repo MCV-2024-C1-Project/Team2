@@ -57,6 +57,6 @@ def crop_and_save_foreground(image, mask_path, output_folder, base_name, contour
 
 
 # Example usage
-image_folder = '../../datasets/qsd2_w3'
-output_folder = 'cropped_qsd2_w3'
+image_folder = '../../datasets/qst2_w3'
+output_folder = 'cropped_qst2_w3'
 crop_foreground_from_mask(image_folder, output_folder)
