@@ -94,7 +94,7 @@ for hist_key in histogram_keys:
         # Flatten the results for comparison with ground truth
         predicted_flattened_k_5 = [p for p in list_results_k_5]
 
-        with open(f'../../datasets/qsd1_w3/gt_corresps.pkl', 'rb') as f:
+        with open('../../datasets/qsd1_w3/gt_corresps.pkl', 'rb') as f:
             ground_truth = pickle.load(f)  # Load ground truth data
 
         # Print the MAP@k results for the current histogram key with the current distance function
