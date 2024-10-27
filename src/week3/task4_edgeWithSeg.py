@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # directory for the masks
-directory = 'datasets/qsd2_w3'
+directory = 'datasets/qst2_w3'
 
 # define function for enhancing the mask
 import cv2
@@ -18,9 +18,6 @@ def contour_mask(mask):
     rectangles = [cv2.boundingRect(contour) for contour in contours]
     # Sort rectangles by area in descending order
     rectangles = sorted(rectangles, key=lambda r: r[2] * r[3], reverse=True)
-
-    height, width = mask.shape
-    total_area = height * width
 
     # Find the two largest non-overlapping rectangles
     largest_rectangles = []

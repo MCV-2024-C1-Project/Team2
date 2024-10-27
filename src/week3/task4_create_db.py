@@ -6,7 +6,7 @@ from skimage.segmentation import clear_border, chan_vese
 from task1 import is_noisy, apply_filters
 
 # Load the image
-directory = 'datasets/qsd2_w3/'
+directory = 'datasets/qst2_w3/'
 
 def check_and_reverse_border(mask, x, threshold):
     """
