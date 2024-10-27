@@ -113,8 +113,8 @@ for hist_key in histogram_keys:
                     list_results_k_1.append(contour_results_k_1[0])  # Single painting, add directly
                     list_results_k_5.append(contour_results_k_5[0])
                 else:
-                    list_results_k_1.append([result[0] for result in contour_results_k_1])  # Multiple paintings, add as list of lists
-                    list_results_k_5.append(contour_results_k_5)
+                    list_results_k_1.append([result[0] for result in reversed(contour_results_k_1)])
+                    list_results_k_5.append(list(reversed(contour_results_k_5)))
 
         # Flatten the results for comparison with ground truth
         predicted_flattened_k_5 = [p for p in list_results_k_5]
