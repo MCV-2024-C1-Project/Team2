@@ -62,7 +62,7 @@ for hist_key in histogram_keys:
                     if os.path.exists(os.path.join(directory, contour2_path)):
                         contour_paths.append(os.path.join(directory, contour2_path))
                 if file_compare_image.endswith('_contour2_w3.pkl'):
-                        continue
+                    continue
 
                 # Prepare to collect results for multiple contours if they exist
                 contour_results_k_1 = []
@@ -113,14 +113,16 @@ for hist_key in histogram_keys:
                     list_results_k_1.append(contour_results_k_1[0])  # Single painting, add directly
                     list_results_k_5.append(contour_results_k_5[0])
                 else:
-                    list_results_k_1.append([result[0] for result in reversed(contour_results_k_1)])
-                    list_results_k_5.append(list(reversed(contour_results_k_5)))
+                    list_results_k_1.append([result[0] for result in contour_results_k_1])
+                    list_results_k_5.append(list(contour_results_k_5))
 
         # Flatten the results for comparison with ground truth
         predicted_flattened_k_5 = [p for p in list_results_k_5]
 
         with open('../../datasets/qsd2_w3/gt_corresps.pkl', 'rb') as f:
             ground_truth = pickle.load(f)  # Load ground truth data
+
+        print(ground_truth)
 
         print(list_results_k_1)
         print(predicted_flattened_k_5)
