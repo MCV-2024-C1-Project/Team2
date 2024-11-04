@@ -11,10 +11,10 @@ csv_file_path = "hist_DCT_HSV_n32_c10_1D_L1.csv"
 # Writing to the CSV file
 with open(csv_file_path, mode='w', newline='') as file:
     writer = csv.writer(file)
-    
+
     # Writing the header
     writer.writerow(["Ground Truth", "K=1 Result", "K=5 Results"])
-    
+
     # Writing each row for ground truth, K=1 result, and K=5 results
     for gt, k1, k5 in zip(ground_truth, K1_results, K5_results):
         writer.writerow([gt, k1, k5])
