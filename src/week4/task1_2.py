@@ -95,11 +95,12 @@ def match_keypoints(descriptors1, descriptors2, ratio_test=0.75, method="L2"):
 def visualize_matches(image1, image2, keypoints1, keypoints2, matches, method):
     match_img = cv2.drawMatches(image1, keypoints1, image2, keypoints2, matches, None,
                                 flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-    
+
     cv2.imwrite(f"src/week4/method_2/matches_{method}.jpg", match_img)
     plt.imshow(match_img)
     plt.axis('off')
     plt.show()
+
 
 # Main function to perform detection, descriptor extraction, and matching
 def process_and_match(image_path1, image_path2, method="ORB", metric="L2"):
@@ -121,15 +122,15 @@ def process_and_match(image_path1, image_path2, method="ORB", metric="L2"):
 
 
 # Run on a sample image
-image_path1 = 'datasets/qsd1_w4/00002.jpg'  
-image_path2 = 'datasets/qsd1_w4/00006.jpg'
+image_path1 = '../../datasets/qsd1_w4/00002.jpg'
+image_path2 = '../../datasets/qsd1_w4/00006.jpg'
 
 process_image(image_path1, method="SIFT")
 process_image(image_path1, method="ORB")
 process_image(image_path1, method="Color-SIFT")
 process_image(image_path1, method="PCA-SIFT")
 
-folder_path = 'datasets/qsd1_w4/'
+folder_path = '../../datasets/qsd1_w4/'
 matches = []
 for filename_1 in os.listdir(folder_path):
     image_matches = []    
@@ -150,9 +151,9 @@ for filename_1 in os.listdir(folder_path):
 
 print(matches)
 
-# process_and_match(image_path1, image_path2, method="SIFT", metric="L2")
-# process_and_match(image_path1, image_path2, method="ORB", metric="Hamming")
-# process_and_match(image_path1, image_path2, method="PCA-SIFT", metric="L2")
+process_and_match(image_path1, image_path2, method="SIFT", metric="L2")
+process_and_match(image_path1, image_path2, method="ORB", metric="Hamming")
+process_and_match(image_path1, image_path2, method="PCA-SIFT", metric="L2")
 
 
 sys.stdout = old_stdout
