@@ -35,8 +35,8 @@ def process_folder_and_evaluate_pkl(pkl_folder):
 
     # Iterate over all .pkl files in the folder
     for filename in os.listdir(pkl_folder):
-        if filename.endswith('_mask_s_contour1.png'):
-            contour2_filename = filename.replace('_mask_s_contour1.png', '_mask_s_contour2.png')
+        if filename.endswith('_contour1.png'):
+            contour2_filename = filename.replace('_contour1.png', '_contour2.png')
 
             if contour2_filename in os.listdir(pkl_folder):
                 # load two masks and join them
@@ -48,7 +48,7 @@ def process_folder_and_evaluate_pkl(pkl_folder):
                 cv2.imshow('image', joined_mask); cv2.waitKey(0); cv2.destroyAllWindows()
 
                 # Load the corresponding ground truth mask (as .png)
-                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_mask_s_contour1.png', '.png'))
+                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_contour1.png', '.png'))
                 ground_truth_mask = cv2.imread(corresponding_image_path, cv2.IMREAD_GRAYSCALE)
                 if ground_truth_mask is None:
                     print(f"Error loading ground truth for {filename}, skipping.")
@@ -72,7 +72,7 @@ def process_folder_and_evaluate_pkl(pkl_folder):
             else:
            
                 #pkl_path = os.path.join(pkl_folder, filename)
-                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_mask_s_contour1.png', '.png'))
+                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_contour1.png', '.png'))
                 image_path = os.path.join(pkl_folder, filename)
                 # Load the .pkl file (which contains the masks)
                 #with open(pkl_path, 'rb') as file:
@@ -122,6 +122,6 @@ def process_folder_and_evaluate_pkl(pkl_folder):
         print("No valid files were processed.")
 
 
-directory = 'datasets/qsd2_w3'
+directory = 'datasets/qsd1_w4'
 
 process_folder_and_evaluate_pkl(directory)

@@ -3,10 +3,10 @@ import numpy as np
 import os
 import pickle   
 from skimage.segmentation import clear_border, chan_vese
-from task1 import is_noisy, apply_filters
+#qfrom task1 import is_noisy, apply_filters
 
 # Load the image
-directory = 'datasets/qst2_w3/'
+directory = 'datasets/qsd1_w4/'
 
 def check_and_reverse_border(mask, x, threshold):
     """
@@ -48,57 +48,45 @@ def check_and_reverse_border(mask, x, threshold):
     
     return mask
 
-# Iterate through the directory to process all .jpg files
-for filename in os.listdir(directory):
-    if filename.endswith('.jpg'):
-        img_path = os.path.join(directory, filename)
+def segment_dir(directory):
+    for filename in os.listdir(directory):
+        if filename.endswith('.jpg'):
+            img_path = os.path.join(directory, filename)
+            print(img_path)
 
-        # Load the image
-        img = cv2.imread(img_path)
-        #img_denoised = apply_filters(img)
-        img_greyscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        img_s = img_hsv[:,:,1]
-        claeh = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        img_s_clahe = claeh.apply(img_s)
+            # Load the image
+            img = cv2.imread(img_path)
+            heigth, width = img.shape[:2]
+            img = cv2.resize(img, (256, 256))
 
-        # Perform Chan-Vese segmentation
-        cv = chan_vese(img_s_clahe, mu=0.08, lambda1=1, lambda2=1, tol=1e-3, max_num_iter=300,
-                       dt=0.5, init_level_set="checkerboard", extended_output=True)
+            img_greyscale = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            img_s = img_hsv[:,:,1]
+            claeh = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            img_s_clahe = claeh.apply(img_s)
 
-        # Convert the result to uint8 to display it
-        cv_uint8 = (cv[0] * 255).astype(np.uint8)
+            # Perform Chan-Vese segmentation
+            cv = chan_vese(img_s_clahe, mu=0.08, lambda1=1, lambda2=1, tol=1e-3, max_num_iter=300,
+                        dt=0.5, init_level_set="checkerboard", extended_output=True)
 
-        new_mask = check_and_reverse_border(cv_uint8, x=5, threshold=0.4)
+            # Convert the result to uint8 to display it
+            cv_uint8 = (cv[0] * 255).astype(np.uint8)
 
-        # Clear the border of the segmented image (cv_uint8)
-        mask = clear_border(cv_uint8)
+            mask = check_and_reverse_border(cv_uint8, x=5, threshold=0.4)
+            #cv2.imshow('mask', mask), cv2.waitKey(0), cv2.destroyAllWindows()
+            mask_resized = cv2.resize(mask, (width, heigth))
+            #cv2.imshow('mask', mask_resized), cv2.waitKey(0), cv2.destroyAllWindows()
 
-        # Store masks in a dictionary
-        masks = {
-            'mask': new_mask,
-            'mask_clear_border': mask
-        }
+            # Save mask as PNG files
+            mask_png_filename = os.path.splitext(filename)[0] + '_seg.png'
 
-        # Save the masks as a .pkl file
-        #pkl_filename = os.path.splitext(filename)[0] + '_seg.pkl'
-        #pkl_path = os.path.join(directory, pkl_filename)
-        
-        #with open(pkl_path, 'wb') as pkl_file:
-            #pickle.dump(masks, pkl_file)
+            mask_png_path = os.path.join(directory, mask_png_filename)
 
-        # Save both masks as PNG files
-        mask_png_filename = os.path.splitext(filename)[0] + '_mask_s.png'
-        mask_clear_border_png_filename = os.path.splitext(filename)[0] + '_mask_clear_border_s.png'
+            # Save the mask images
+            cv2.imwrite(mask_png_path, mask_resized)
 
-        mask_png_path = os.path.join(directory, mask_png_filename)
-        mask_clear_border_png_path = os.path.join(directory, mask_clear_border_png_filename)
+            print(f"Saved {mask_png_filename}.")
 
-        # Save the mask images
-        cv2.imwrite(mask_png_path, new_mask)
-        cv2.imwrite(mask_clear_border_png_path, mask)
-
-        print(f"Saved {mask_png_filename} and {mask_clear_border_png_filename}.")
-            
+segment_dir(directory)            
 print('Finish the data folder proccessing')
         
