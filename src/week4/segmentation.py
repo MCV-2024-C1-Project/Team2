@@ -7,7 +7,7 @@ from ColorSegmentation import chan_vese_segmentation_colors
 print("\n")
 print("Week 4 - Segmentation")
 # Load the image
-directory = 'datasets/qsd1_w4/'
+directory = '../../datasets/qst1_w4/'
 
 # Global Parameters
 # Changeable parameters
@@ -66,7 +66,7 @@ def check_and_reverse_border(mask, x = 5, threshold = 0.5):
 def create_mask(directory, mu, nu, lambda1, lambda2):
 # Iterate through the directory to process all .jpg files
     for filename in os.listdir(directory):
-        if filename.endswith('.png'): # Change string according to dataset
+        if filename.endswith('.jpg'): # Change string according to dataset
             img_path = os.path.join(directory, filename)
             print(f"Processing {img_path}...")
 
@@ -99,6 +99,7 @@ def create_mask(directory, mu, nu, lambda1, lambda2):
         else:
             continue
 
-            
+
+create_mask(directory, mu, nu, lambda1, lambda2)
+
 print('Finish the data folder proccessing')
-        

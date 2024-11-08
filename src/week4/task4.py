@@ -93,7 +93,7 @@ def calculate_mapk(matches, ground_truth, k_values=[1, 5, 10]):
 
 
 # Start
-directory = 'filtered_cropped_qsd1_w4'  # Directory containing the filtered images
+directory = 'filtered_cropped_qst1_w4'  # Directory containing the filtered images
 directory_bbdd = '../../data/BBDD/week4'  # Directory containing the database of images
 
 # Run the matching process and evaluate

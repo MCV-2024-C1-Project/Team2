@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # directory for the masks
-directory = 'datasets/qst2_w3'
+directory = '../../datasets/qst1_w4'
 
 # define function for enhancing the mask
 import cv2
@@ -75,7 +75,7 @@ def contour_mask(mask):
 
 # Iterate through the directory to process all .jpg files
 for filename in os.listdir(directory):
-    if filename.endswith('mask_s.png'):
+    if filename.endswith('.png'):
         img_path = os.path.join(directory, filename)
 
         # Load the image
