@@ -36,19 +36,19 @@ def process_folder_and_evaluate_pkl(pkl_folder):
     # Iterate over all .pkl files in the folder
     for filename in os.listdir(pkl_folder):
         if filename.endswith('_contour1.png'):
-            contour2_filename = filename.replace('_contour1.png', '_contour2.png')
+            contour2_filename = filename.replace('seg_contour1.png', 'seg_contour2.png')
 
             if contour2_filename in os.listdir(pkl_folder):
-                # load two masks and join them
+                # load two masks and join themq
                 image_path1 = os.path.join(pkl_folder, filename)
                 image_path2 = os.path.join(pkl_folder, contour2_filename)
                 mask1 = cv2.imread(image_path1, cv2.IMREAD_GRAYSCALE)
                 mask2 = cv2.imread(image_path2, cv2.IMREAD_GRAYSCALE)
                 joined_mask = np.maximum(mask1, mask2)
-                cv2.imshow('image', joined_mask); cv2.waitKey(0); cv2.destroyAllWindows()
+                #cv2.imshow('image', joined_mask); cv2.waitKey(0); cv2.destroyAllWindows()
 
                 # Load the corresponding ground truth mask (as .png)
-                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_contour1.png', '.png'))
+                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_seg_contour1.png', '.png'))
                 ground_truth_mask = cv2.imread(corresponding_image_path, cv2.IMREAD_GRAYSCALE)
                 if ground_truth_mask is None:
                     print(f"Error loading ground truth for {filename}, skipping.")
@@ -72,13 +72,13 @@ def process_folder_and_evaluate_pkl(pkl_folder):
             else:
            
                 #pkl_path = os.path.join(pkl_folder, filename)
-                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_contour1.png', '.png'))
+                corresponding_image_path = os.path.join(pkl_folder, filename.replace('_seg_contour1.png', '.png'))
                 image_path = os.path.join(pkl_folder, filename)
                 # Load the .pkl file (which contains the masks)
                 #with open(pkl_path, 'rb') as file:
                     #masks = pickle.load(file)
                 masks = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-                cv2.imshow('image', masks); cv2.waitKey(0); cv2.destroyAllWindows()
+                #cv2.imshow('image', masks); cv2.waitKey(0); cv2.destroyAllWindows()
                 # Choose the mask to evaluate based on the parameter
                 #if mask_type not in masks:
                     #print(f"Error: mask type '{mask_type}' not found in {filename}. Skipping.")
