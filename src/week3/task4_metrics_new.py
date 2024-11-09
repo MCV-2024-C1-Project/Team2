@@ -5,7 +5,7 @@ import pandas as pd
 import utils
 import numpy as np
 
-directory = 'filtered_cropped_qsd2_w3'  # Directory containing the filtered images
+directory = 'filtered_cropped_qsd1_w4'  # Directory containing the filtered images
 directory_bbdd = '../../data/BBDD/week3'  # Directory containing the database of images
 
 
@@ -187,7 +187,7 @@ for hist_key in histogram_keys:
         flattened_k5 = [item for sublist in list_results_k_5 for item in sublist]
 
         # Load the ground truth
-        with open('../../datasets/qsd2_w3/gt_corresps.pkl', 'rb') as f:
+        with open('../../datasets/qsd1_w4/gt_corresps.pkl', 'rb') as f:
             ground_truth = pickle.load(f)
 
         print("ground_truth:\n", ground_truth)
@@ -212,5 +212,5 @@ for hist_key in histogram_keys:
 
 # Save the results to a CSV file
 results_df = results_df.sort_values(by='k1', ascending=False)
-results_df.to_csv('mapk_results_corrected.csv', index=False)
+results_df.to_csv('mapk_results_qsd1_w4.csv', index=False)
 print("Finished processing all histogram keys and distance functions.")

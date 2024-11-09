@@ -4,7 +4,7 @@ import pickle
 import pandas as pd
 import utils
 
-directory = 'filtered_cropped_qsd2_w3'  # Directory containing the filtered images
+directory = 'filtered_cropped_qsd1_w4'  # Directory containing the filtered images
 directory_bbdd = '../../data/BBDD/week3'  # Directory containing the database of images
 
 def extract_number_from_filename(filename):
@@ -119,7 +119,7 @@ for hist_key in histogram_keys:
         # Flatten the results for comparison with ground truth
         predicted_flattened_k_5 = [p for p in list_results_k_5]
 
-        with open('../../datasets/qsd2_w3/gt_corresps.pkl', 'rb') as f:
+        with open('../../datasets/qsd1_w4/gt_corresps.pkl', 'rb') as f:
             ground_truth = pickle.load(f)  # Load ground truth data
 
         print(ground_truth)
