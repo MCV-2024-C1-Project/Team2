@@ -243,7 +243,7 @@ def process_folder_and_evaluate(image_folder):
 
 
 # Folder path for the images
-image_folder = 'src/week3/filtered_img_qsd2_w3'
+image_folder = 'datasets/qsd1_w4'
 
 # Evaluate both methods on the specified folder
 process_folder_and_evaluate(image_folder)
