@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 
-image_path = 'cropped_qst1_w4/'
+image_path = '../../datasets/qsd1_w4/'
 
 
 old_stdout = sys.stdout
@@ -114,17 +114,17 @@ for filename in os.listdir(image_path):
                     best_result = cv2.morphologyEx(
                         filtered_image, cv2.MORPH_OPEN, kernel)
 
-            cv2.imwrite('filtered_cropped_qst1_w4/' + filename, best_result)
+            cv2.imwrite('filtered_qsd1_w4_adptv/' + filename, best_result)
 
         elif average_brightness > hue_threshold:
 
             hue_factor = 1.5
             transformed_image = multiply_hue(image, hue_factor)
 
-            cv2.imwrite('filtered_cropped_qst1_w4/' + filename, transformed_image)
+            cv2.imwrite('filtered_qsd1_w4_adptv/' + filename, transformed_image)
 
         else:
-            cv2.imwrite('filtered_cropped_qst1_w4/' + filename, image)
+            cv2.imwrite('filtered_qsd1_w4_adptv/' + filename, image)
 
 sys.stdout = old_stdout
 log_file.close()

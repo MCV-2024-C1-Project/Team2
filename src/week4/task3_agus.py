@@ -95,7 +95,7 @@ def find_bidirectional_matches(desc1, desc2, ratio_thresh=0.75):
     return good_matches
 
 # Directories for query and database folders
-directory_query = 'filtered_cropped_qsd1_w4'
+directory_query = 'filtered_cropped_qsd1_w4_adptv'
 directory_bbdd = '../../data/BBDD/week4'
 
 # Provided ground truth

@@ -72,11 +72,11 @@ def process_directory(directory_path, flag=0):
                 pickle.dump(histograms, pkl_file)
 
 # Process both folders
-directory_query1 = "filtered_cropped_qsd1_w4"
+directory_query1 = "filtered_cropped_qsd1_w4_adptv"
 
 print("Current working directory:", os.getcwd())
 print("Processing directory 1:")
 process_directory(directory_query1, flag=0)
 
-directory_query2 = "../../data/BBDD"
-process_directory(directory_query2, flag=1)
+# directory_query2 = "../../data/BBDD"
+# process_directory(directory_query2, flag=1)

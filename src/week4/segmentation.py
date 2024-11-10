@@ -7,7 +7,7 @@ from ColorSegmentation import chan_vese_segmentation_colors
 print("\n")
 print("Week 4 - Segmentation")
 # Load the image
-directory = '../../datasets/qst1_w4/'
+directory = 'filtered_qsd1_w4_adptv/'
 
 # Global Parameters
 # Changeable parameters

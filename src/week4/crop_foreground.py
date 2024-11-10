@@ -13,8 +13,8 @@ def crop_foreground_from_mask(image_folder, output_folder):
             # Construct the paths for the image and the corresponding masks
             image_path = os.path.join(image_folder, filename)
             base_name = os.path.splitext(filename)[0]
-            mask1_path = os.path.join(image_folder, f"{base_name}_contour1.png")
-            mask2_path = os.path.join(image_folder, f"{base_name}_contour2.png")
+            mask1_path = os.path.join(image_folder, f"{base_name}_adptv_contour1.png")
+            mask2_path = os.path.join(image_folder, f"{base_name}_adptv_contour2.png")
 
             # Load the image
             image = cv2.imread(image_path)
@@ -57,6 +57,6 @@ def crop_and_save_foreground(image, mask_path, output_folder, base_name, contour
 
 
 # Example usage
-image_folder = '../../datasets/qst1_w4'
-output_folder = 'cropped_qst1_w4'
+image_folder = 'filtered_qsd1_w4_adptv'
+output_folder = 'filtered_cropped_qsd1_w4_adptv'
 crop_foreground_from_mask(image_folder, output_folder)
